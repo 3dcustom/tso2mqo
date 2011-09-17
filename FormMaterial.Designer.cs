@@ -1,4 +1,4 @@
-﻿namespace tso2mqo
+﻿namespace Tso2MqoGui
 {
     partial class FormMaterial
     {

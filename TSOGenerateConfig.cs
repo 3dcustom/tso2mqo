@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace tso2mqo
+namespace Tso2MqoGui
 {
     public class TSOGenerateConfig
     {

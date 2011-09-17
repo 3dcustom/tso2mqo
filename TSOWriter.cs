@@ -2,17 +2,22 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
-using Microsoft.DirectX;
-using Microsoft.DirectX.Direct3D;
-using tso2mqo.Extensions;
 
-namespace tso2mqo
+namespace Tso2MqoGui
 {
     public class TSOWriter
     {
         public static void WriteHeader(BinaryWriter bw)
         {
             bw.Write(0x314F5354);
+        }
+
+        public static void Write(BinaryWriter bw, string s)
+        {
+            foreach(byte i in Encoding.Default.GetBytes(s))
+                bw.Write(i);
+
+            bw.Write((byte)0);
         }
 
         public static void Write(BinaryWriter bw, string[] s)
@@ -22,7 +27,7 @@ namespace tso2mqo
             bw.Write(n);
 
             for(int i= 0; i < n; ++i)
-                bw.WriteCString(s[i]);
+                Write(bw, s[i]);
         }
 
         public static void Write(BinaryWriter bw, TSONode[] items)
@@ -34,16 +39,21 @@ namespace tso2mqo
 
             bw.Write(items.Length);
 
-            foreach (var i in items)
-            {
-                Matrix m = i.Matrix;
-                bw.Write(ref m);
-            }
+            foreach(var i in items)
+                Write(bw, i.Matrix);
         }
 
         public static void Write(BinaryWriter bw, TSONode item)
         {
-            bw.WriteCString(item.Name);
+            Write(bw, item.Name);
+        }
+
+        public static void Write(BinaryWriter bw, Matrix44 item)
+        {
+            bw.Write(item.M11); bw.Write(item.M12); bw.Write(item.M13); bw.Write(item.M14);
+            bw.Write(item.M21); bw.Write(item.M22); bw.Write(item.M23); bw.Write(item.M24);
+            bw.Write(item.M31); bw.Write(item.M32); bw.Write(item.M33); bw.Write(item.M34);
+            bw.Write(item.M41); bw.Write(item.M42); bw.Write(item.M43); bw.Write(item.M44);
         }
 
         public static void Write(BinaryWriter bw, TSOTex[] items)
@@ -56,8 +66,8 @@ namespace tso2mqo
 
         public static void Write(BinaryWriter bw, TSOTex item)
         {
-            bw.WriteCString(item.name);
-            bw.WriteCString(item.file);
+            Write(bw, item.name);
+            Write(bw, item.file);
             bw.Write(item.Width);
             bw.Write(item.Height);
             bw.Write(item.Depth);
@@ -74,7 +84,7 @@ namespace tso2mqo
 
         public static void Write(BinaryWriter bw, TSOEffect item)
         {
-            bw.WriteCString(item.Name);
+            Write(bw, item.Name);
             Write(bw, item.Code.Split('\n'));
         }
 
@@ -88,8 +98,8 @@ namespace tso2mqo
 
         public static void Write(BinaryWriter bw, TSOMaterial item)
         {
-            bw.WriteCString(item.Name);
-            bw.WriteCString(item.File);
+            Write(bw, item.Name);
+            Write(bw, item.File);
             Write(bw, item.Code.Split('\n'));
         }
 
@@ -103,9 +113,8 @@ namespace tso2mqo
 
         public static void Write(BinaryWriter bw, TSOMesh item)
         {
-            bw.WriteCString(item.Name);
-            Matrix m = item.Matrix;
-            bw.Write(ref m);
+            Write(bw, item.Name);
+            Write(bw, item.Matrix);
             bw.Write(1);
             Write(bw, item.sub);
         }
@@ -139,13 +148,13 @@ namespace tso2mqo
             List<int>   idxs    = new List<int>(4);
             List<float> wgts    = new List<float>(4);
 
-            if(v.Wgt.X > 0) { idxs.Add(idx[0]); wgts.Add(v.Wgt.X); }
-            if(v.Wgt.Y > 0) { idxs.Add(idx[1]); wgts.Add(v.Wgt.Y); }
-            if(v.Wgt.Z > 0) { idxs.Add(idx[2]); wgts.Add(v.Wgt.Z); }
-            if(v.Wgt.W > 0) { idxs.Add(idx[3]); wgts.Add(v.Wgt.W); }
+            if(v.Wgt.x > 0) { idxs.Add(idx[0]); wgts.Add(v.Wgt.x); }
+            if(v.Wgt.y > 0) { idxs.Add(idx[1]); wgts.Add(v.Wgt.y); }
+            if(v.Wgt.z > 0) { idxs.Add(idx[2]); wgts.Add(v.Wgt.z); }
+            if(v.Wgt.w > 0) { idxs.Add(idx[3]); wgts.Add(v.Wgt.w); }
 
-            bw.Write(ref v.Pos);
-            bw.Write(ref v.Nrm);
+            bw.Write(v.Pos.X); bw.Write(v.Pos.Y); bw.Write(v.Pos.Z);
+            bw.Write(v.Nrm.X); bw.Write(v.Nrm.Y); bw.Write(v.Nrm.Z);
             bw.Write(v.Tex.X); bw.Write(v.Tex.Y);
 
             bw.Write(wgts.Count);

@@ -4,7 +4,7 @@ using System.IO;
 using System.Text;
 using System.Windows.Forms;
 
-namespace tso2mqo
+namespace Tso2MqoGui
 {
     static class Program
     {

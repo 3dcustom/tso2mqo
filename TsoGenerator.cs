@@ -7,10 +7,8 @@ using System.Runtime.InteropServices;
 using System.ComponentModel;
 using System.Windows.Forms;
 using System.Windows.Forms.Design;
-using Microsoft.DirectX;
-using Microsoft.DirectX.Direct3D;
 
-namespace tso2mqo
+namespace Tso2MqoGui
 {
     public unsafe class TsoGenerator
     {
@@ -48,7 +46,7 @@ namespace tso2mqo
             pc  = new PointCluster(vlst.Count);
 
             foreach(Vertex i in vlst)
-                pc.Add(i.Pos);
+                pc.Add(i.Pos.x, i.Pos.y, i.Pos.z);
 
             pc.Clustering();
         }
@@ -275,17 +273,17 @@ namespace tso2mqo
                 // 一番近い頂点への参照
                 List<int>       vref= new List<int>(i.vertices.Count);
 
-                foreach (Vector3 j in i.vertices)
-                    vref.Add(pc.NearestIndex(j));
+                foreach(Point3 j in i.vertices)
+                    vref.Add(pc.NearestIndex(j.x, j.y, j.z));
 
                 // 法線生成
-                Vector3[] nrm = new Vector3[i.vertices.Count];
+                Point3[]        nrm = new Point3[i.vertices.Count];
                 
                 foreach(MqoFace j in i.faces)
                 {
-                    Vector3 v1 = Vector3.Normalize(i.vertices[j.b] - i.vertices[j.a]);
-                    Vector3 v2 = Vector3.Normalize(i.vertices[j.c] - i.vertices[j.b]);
-                    Vector3 n = Vector3.Normalize(Vector3.Cross(v1, v2));
+                    Point3  v1  = Point3.Normalize(i.vertices[j.b] - i.vertices[j.a]);
+                    Point3  v2  = Point3.Normalize(i.vertices[j.c] - i.vertices[j.b]);
+                    Point3  n   = Point3.Normalize(Point3.Cross(v1, v2));
 #if false
                     nrm[j.a]    +=n;
                     nrm[j.b]    +=n;
@@ -298,7 +296,7 @@ namespace tso2mqo
                 }
 
                 for(int j= 0; j < nrm.Length; ++j)
-                    nrm[j] = Vector3.Normalize(nrm[j]);
+                    nrm[j]      = Point3.Normalize(nrm[j]);
 
                 // フェイスの組成
                 List<int>               faces1  = new List<int>();
@@ -344,7 +342,7 @@ namespace tso2mqo
                         {
                             Vertex      vv      = v[k];
                             UInt32      idx0    = vv.Idx;
-                            Vector4 wgt0 = vv.Wgt;
+                            Point4      wgt0    = vv.Wgt;
                             byte*       idx     = (byte*)(&idx0);
                             float*      wgt     = (float*)(&wgt0);
 
@@ -392,9 +390,9 @@ namespace tso2mqo
                         }
 
                         // \todo 点の追加
-                        Vertex va = new Vertex(i.vertices[f.a], v[0].Wgt, v[0].Idx, nrm[f.a], new Vector2(f.ta.X, 1 - f.ta.Y));
-                        Vertex vb = new Vertex(i.vertices[f.b], v[1].Wgt, v[1].Idx, nrm[f.b], new Vector2(f.tb.X, 1 - f.tb.Y));
-                        Vertex vc = new Vertex(i.vertices[f.c], v[2].Wgt, v[2].Idx, nrm[f.c], new Vector2(f.tc.X, 1 - f.tc.Y));
+                        Vertex  va  = new Vertex(i.vertices[f.a], v[0].Wgt, v[0].Idx, nrm[f.a], new Point2(f.ta.x, 1-f.ta.y));
+                        Vertex  vb  = new Vertex(i.vertices[f.b], v[1].Wgt, v[1].Idx, nrm[f.b], new Point2(f.tb.x, 1-f.tb.y));
+                        Vertex  vc  = new Vertex(i.vertices[f.c], v[2].Wgt, v[2].Idx, nrm[f.c], new Point2(f.tc.x, 1-f.tc.y));
 #if false
                         indices.Add(vh.Add(va));
                         indices.Add(vh.Add(vb));
@@ -416,7 +414,7 @@ namespace tso2mqo
                     {
                         uint        idx0= verts[j].Idx;
                         byte*       idx = (byte*)(&idx0);
-                        Vector4 wgt0 = verts[j].Wgt;
+                        Point4      wgt0= verts[j].Wgt;
                         float*      wgt = (float*)(&wgt0);
 
                         for(int k= 0; k < 4; ++k)
@@ -451,7 +449,7 @@ namespace tso2mqo
                 mesh.name       = i.name;
                 mesh.numsubs    = subs.Count;
                 mesh.sub        = subs.ToArray();
-                mesh.matrix     = Matrix.Identity;
+                mesh.matrix     = Matrix44.Identity;
                 mesh.effect     = 0;
                 meshes.Add(mesh);
             }
@@ -471,24 +469,24 @@ namespace tso2mqo
                 System.Diagnostics.Debug.WriteLine("object:" + i.name);            
 #endif
                 // 法線生成
-                Vector3[] nrm = new Vector3[i.vertices.Count];
+                Point3[]        nrm = new Point3[i.vertices.Count];
                 
                 foreach(MqoFace j in i.faces)
                 {
-                    Vector3 v1 = Vector3.Normalize(i.vertices[j.b] - i.vertices[j.a]);
-                    Vector3 v2 = Vector3.Normalize(i.vertices[j.c] - i.vertices[j.b]);
-                    Vector3 n = Vector3.Normalize(Vector3.Cross(v1, v2));
+                    Point3  v1  = Point3.Normalize(i.vertices[j.b] - i.vertices[j.a]);
+                    Point3  v2  = Point3.Normalize(i.vertices[j.c] - i.vertices[j.b]);
+                    Point3  n   = Point3.Normalize(Point3.Cross(v1, v2));
                     nrm[j.a]    -=n;
                     nrm[j.b]    -=n;
                     nrm[j.c]    -=n;
                 }
 
                 for(int j= 0; j < nrm.Length; ++j)
-                    nrm[j] = Vector3.Normalize(nrm[j]);
+                    nrm[j]      = Point3.Normalize(nrm[j]);
 
                 // ボーン情報作成
                 uint                idx     = 0x00000000;
-                Vector4 wgt = new Vector4(1, 0, 0, 0);
+                Point4              wgt     = new Point4(1, 0, 0, 0);
                 int[]               bones   = new int[1];
                 string              bone    = config.boneref[i.name];
                 bones[0]                    = nodes[bone].ID;
@@ -508,9 +506,9 @@ namespace tso2mqo
                         if(f.mtl != mtl)
                             continue;
 
-                        Vertex va = new Vertex(i.vertices[f.a], wgt, idx, nrm[f.a], new Vector2(f.ta.X, 1 - f.ta.Y));
-                        Vertex vb = new Vertex(i.vertices[f.b], wgt, idx, nrm[f.b], new Vector2(f.tb.X, 1 - f.tb.Y));
-                        Vertex vc = new Vertex(i.vertices[f.c], wgt, idx, nrm[f.c], new Vector2(f.tc.X, 1 - f.tc.Y));
+                        Vertex  va  = new Vertex(i.vertices[f.a], wgt, idx, nrm[f.a], new Point2(f.ta.x, 1-f.ta.y));
+                        Vertex  vb  = new Vertex(i.vertices[f.b], wgt, idx, nrm[f.b], new Point2(f.tb.x, 1-f.tb.y));
+                        Vertex  vc  = new Vertex(i.vertices[f.c], wgt, idx, nrm[f.c], new Point2(f.tc.x, 1-f.tc.y));
 
                         indices.Add(vh.Add(va));
                         indices.Add(vh.Add(vc));
@@ -543,7 +541,7 @@ namespace tso2mqo
                 mesh.name       = i.name;
                 mesh.numsubs    = subs.Count;
                 mesh.sub        = subs.ToArray();
-                mesh.matrix     = Matrix.Identity;
+                mesh.matrix     = Matrix44.Identity;
                 mesh.effect     = 0;
                 meshes.Add(mesh);
             }
@@ -706,7 +704,7 @@ namespace tso2mqo
             bw.Write((byte)0);
         }
 
-        public void WriteMatrix(BinaryWriter bw, Matrix m)
+        public void WriteMatrix(BinaryWriter bw, Matrix44 m)
         {
             bw.Write(m.M11); bw.Write(m.M12); bw.Write(m.M13); bw.Write(m.M14);
             bw.Write(m.M21); bw.Write(m.M22); bw.Write(m.M23); bw.Write(m.M24);
@@ -721,10 +719,10 @@ namespace tso2mqo
             List<int>   idxs    = new List<int>(4);
             List<float> wgts    = new List<float>(4);
 
-            if(v.Wgt.X > 0) { idxs.Add(idx[0]); wgts.Add(v.Wgt.X); }
-            if(v.Wgt.Y > 0) { idxs.Add(idx[1]); wgts.Add(v.Wgt.Y); }
-            if(v.Wgt.Z > 0) { idxs.Add(idx[2]); wgts.Add(v.Wgt.Z); }
-            if(v.Wgt.W > 0) { idxs.Add(idx[3]); wgts.Add(v.Wgt.W); }
+            if(v.Wgt.x > 0) { idxs.Add(idx[0]); wgts.Add(v.Wgt.x); }
+            if(v.Wgt.y > 0) { idxs.Add(idx[1]); wgts.Add(v.Wgt.y); }
+            if(v.Wgt.z > 0) { idxs.Add(idx[2]); wgts.Add(v.Wgt.z); }
+            if(v.Wgt.w > 0) { idxs.Add(idx[3]); wgts.Add(v.Wgt.w); }
 
             bw.Write(v.Pos.X); bw.Write(v.Pos.Y); bw.Write(v.Pos.Z);
             bw.Write(v.Nrm.X); bw.Write(v.Nrm.Y); bw.Write(v.Nrm.Z);

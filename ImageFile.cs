@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Runtime.InteropServices;
 
-namespace tso2mqo
+namespace Tso2MqoGui
 {
     using BYTE  = Byte;
     using WORD  = UInt16;

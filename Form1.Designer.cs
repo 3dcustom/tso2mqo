@@ -1,4 +1,4 @@
-﻿namespace tso2mqo
+﻿namespace Tso2MqoGui
 {
     partial class Form1
     {
@@ -34,6 +34,8 @@
             this.label2 = new System.Windows.Forms.Label();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
+            this.rbBoneRokDeBone = new System.Windows.Forms.RadioButton();
+            this.rbBoneNone = new System.Windows.Forms.RadioButton();
             this.cbCopyTSO = new System.Windows.Forms.CheckBox();
             this.cbMakeSub = new System.Windows.Forms.CheckBox();
             this.tabPage2 = new System.Windows.Forms.TabPage();
@@ -137,18 +139,42 @@
             // tabPage1
             // 
             this.tabPage1.BackColor = System.Drawing.Color.LightSteelBlue;
+            this.tabPage1.Controls.Add(this.rbBoneRokDeBone);
+            this.tabPage1.Controls.Add(this.rbBoneNone);
             this.tabPage1.Controls.Add(this.cbCopyTSO);
             this.tabPage1.Controls.Add(this.cbMakeSub);
             this.tabPage1.Controls.Add(this.label1);
             this.tabPage1.Controls.Add(this.label2);
             this.tabPage1.Controls.Add(this.button1);
             this.tabPage1.Controls.Add(this.tbPath);
-            this.tabPage1.Location = new System.Drawing.Point(4, 22);
+            this.tabPage1.Location = new System.Drawing.Point(4, 21);
             this.tabPage1.Name = "tabPage1";
             this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage1.Size = new System.Drawing.Size(488, 274);
+            this.tabPage1.Size = new System.Drawing.Size(488, 275);
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "Tso->Mqo";
+            // 
+            // rbBoneRokDeBone
+            // 
+            this.rbBoneRokDeBone.AutoSize = true;
+            this.rbBoneRokDeBone.Location = new System.Drawing.Point(126, 75);
+            this.rbBoneRokDeBone.Name = "rbBoneRokDeBone";
+            this.rbBoneRokDeBone.Size = new System.Drawing.Size(170, 16);
+            this.rbBoneRokDeBone.TabIndex = 7;
+            this.rbBoneRokDeBone.TabStop = true;
+            this.rbBoneRokDeBone.Text = "RokDeBone形式のボーン作成";
+            this.rbBoneRokDeBone.UseVisualStyleBackColor = true;
+            // 
+            // rbBoneNone
+            // 
+            this.rbBoneNone.AutoSize = true;
+            this.rbBoneNone.Location = new System.Drawing.Point(6, 75);
+            this.rbBoneNone.Name = "rbBoneNone";
+            this.rbBoneNone.Size = new System.Drawing.Size(114, 16);
+            this.rbBoneNone.TabIndex = 6;
+            this.rbBoneNone.TabStop = true;
+            this.rbBoneNone.Text = "ボーンを作成しない";
+            this.rbBoneNone.UseVisualStyleBackColor = true;
             // 
             // cbCopyTSO
             // 
@@ -187,10 +213,10 @@
             this.tabPage2.Controls.Add(this.bRefMqoIn);
             this.tabPage2.Controls.Add(this.tbMqoIn);
             this.tabPage2.Controls.Add(this.label3);
-            this.tabPage2.Location = new System.Drawing.Point(4, 22);
+            this.tabPage2.Location = new System.Drawing.Point(4, 21);
             this.tabPage2.Name = "tabPage2";
             this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage2.Size = new System.Drawing.Size(488, 274);
+            this.tabPage2.Size = new System.Drawing.Size(488, 275);
             this.tabPage2.TabIndex = 1;
             this.tabPage2.Text = "Mqo->Tso";
             // 
@@ -458,9 +484,9 @@
             this.tabPage3.Controls.Add(this.bMergeAdd);
             this.tabPage3.Controls.Add(this.label8);
             this.tabPage3.Controls.Add(this.tvMerge);
-            this.tabPage3.Location = new System.Drawing.Point(4, 22);
+            this.tabPage3.Location = new System.Drawing.Point(4, 21);
             this.tabPage3.Name = "tabPage3";
-            this.tabPage3.Size = new System.Drawing.Size(488, 274);
+            this.tabPage3.Size = new System.Drawing.Size(488, 275);
             this.tabPage3.TabIndex = 2;
             this.tabPage3.Text = "Merge";
             // 
@@ -614,6 +640,8 @@
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.Button bExpOk;
         private System.Windows.Forms.CheckBox cbCopyTSO;
+        private System.Windows.Forms.RadioButton rbBoneRokDeBone;
+        private System.Windows.Forms.RadioButton rbBoneNone;
         private System.Windows.Forms.GroupBox gbBone;
         private System.Windows.Forms.Button bRefresh;
         private System.Windows.Forms.Button bSelectAll;

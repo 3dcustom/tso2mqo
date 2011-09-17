@@ -3,10 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
-using Microsoft.DirectX;
-using Microsoft.DirectX.Direct3D;
 
-namespace tso2mqo
+namespace Tso2MqoGui
 {
     public class MqoFile
     {
@@ -264,7 +262,7 @@ namespace tso2mqo
         {
             if(tokens[2].ToLower() != "{")          Error(tokens);
 
-            current.vertices = new List<Vector3>(int.Parse(tokens[1]));
+            current.vertices    = new List<Point3>(int.Parse(tokens[1]));
             DoRead(SectionVertex);
         }
 
@@ -275,49 +273,17 @@ namespace tso2mqo
             current.faces       = new List<MqoFace>(int.Parse(tokens[1]));
             DoRead(SectionFace);
         }
-
-        public partial struct Color3
-        {
-            public static Vector3 Parse(string[] t, int begin)
-            {
-                return new Vector3(
-                    float.Parse(t[begin + 0]),
-                    float.Parse(t[begin + 1]),
-                    float.Parse(t[begin + 2]));
-            }
-        }
-
-        public partial struct Point2
-        {
-            public static Vector2 Parse(string[] t, int begin)
-            {
-                return new Vector2(
-                    float.Parse(t[begin + 0]),
-                    float.Parse(t[begin + 1]));
-            }
-        }
-
-        public partial struct Point3
-        {
-            public static Vector3 Parse(string[] t, int begin)
-            {
-                return new Vector3(
-                    float.Parse(t[begin + 0]),
-                    float.Parse(t[begin + 1]),
-                    float.Parse(t[begin + 2]));
-            }
-        }
     }
 
     public class MqoScene
     {
-        public Vector3 pos;
-        public Vector3 lookat;
+        public Point3           pos;
+        public Point3           lookat;
         public float            head;
         public float            pich;
         public float            ortho;
         public float            zoom2;
-        public Vector3 amb;
+        public Color3           amb;
 
         public override string ToString()
         {
@@ -337,7 +303,7 @@ namespace tso2mqo
     {
         public string           name;
         public int              shader;
-        public Vector3 col;
+        public Color3           col;
         public float            dif;
         public float            amb;
         public float            emi;
@@ -371,9 +337,9 @@ namespace tso2mqo
 	    public int              locking;
 	    public int              shading;
 	    public float            facet;
-        public Vector3 color;
+	    public Color3           color;
 	    public int              color_type;
-        public List<Vector3> vertices;
+        public List<Point3>     vertices;
         public List<MqoFace>    faces;
 
         public MqoObject()              {           }
@@ -398,13 +364,13 @@ namespace tso2mqo
     public class  MqoFace
     {
         public ushort   a, b, c, mtl;
-        public Vector2 ta, tb, tc;
+        public Point2   ta, tb, tc;
 
         public MqoFace()
         {
         }
 
-        public MqoFace(ushort a, ushort b, ushort c, ushort mtl, Vector2 ta, Vector2 tb, Vector2 tc)
+        public MqoFace(ushort a, ushort b, ushort c, ushort mtl, Point2 ta, Point2 tb, Point2 tc)
         {
             this.a  = a;
             this.b  = b;

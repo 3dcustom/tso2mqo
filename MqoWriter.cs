@@ -2,11 +2,16 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
-using Microsoft.DirectX;
-using Microsoft.DirectX.Direct3D;
 
-namespace tso2mqo
+namespace Tso2MqoGui
 {
+    public enum MqoBoneMode
+    {
+        None,
+        RokDeBone,
+        Mikoto,
+    }
+
     public class Pair<T, U>
     {
         public T    First;
@@ -28,6 +33,7 @@ namespace tso2mqo
         public TextWriter   tw;
         public string       OutPath;
         public string       OutFile;
+        public MqoBoneMode  BoneMode    = MqoBoneMode.None;
 
         public MqoWriter(string file)
         {
@@ -167,7 +173,7 @@ namespace tso2mqo
                         ++cnt;
                         va= vb; a= b;
                         vb= vc; b= c;
-                        vc= k;  c= vh.Add(new UVertex(k.Pos.X, k.Pos.Y, k.Pos.Z, k.Nrm.X, k.Nrm.Y, k.Nrm.Z, k.Tex.X, k.Tex.Y, j.spec));
+                        vc= k;  c= vh.Add(new UVertex(k.Pos.x, k.Pos.y, k.Pos.z, k.Nrm.x, k.Nrm.y, k.Nrm.z, k.Tex.x, k.Tex.y, j.spec));
 
                         if(cnt < 3)                     continue;
                         if(a == b || b == c || c == a)  continue;
@@ -177,18 +183,18 @@ namespace tso2mqo
                           //face.Add(a); uv.Add(va.Tex.x); uv.Add(va.Tex.y);
                           //face.Add(b); uv.Add(vb.Tex.x); uv.Add(vb.Tex.y);
                           //face.Add(c); uv.Add(vc.Tex.x); uv.Add(vc.Tex.y);
-                            face.Add(a); uv.Add(va.Tex.X); uv.Add(1-va.Tex.Y);
-                            face.Add(b); uv.Add(vb.Tex.X); uv.Add(1-vb.Tex.Y);
-                            face.Add(c); uv.Add(vc.Tex.X); uv.Add(1-vc.Tex.Y);
+                            face.Add(a); uv.Add(va.Tex.x); uv.Add(1-va.Tex.y);
+                            face.Add(b); uv.Add(vb.Tex.x); uv.Add(1-vb.Tex.y);
+                            face.Add(c); uv.Add(vc.Tex.x); uv.Add(1-vc.Tex.y);
                             mtl.Add(j.spec);
                         } else
                         {
                           //face.Add(a); uv.Add(va.Tex.x); uv.Add(va.Tex.y);
                           //face.Add(c); uv.Add(vc.Tex.x); uv.Add(vc.Tex.y);
                           //face.Add(b); uv.Add(vb.Tex.x); uv.Add(vb.Tex.y);
-                            face.Add(a); uv.Add(va.Tex.X); uv.Add(1-va.Tex.Y);
-                            face.Add(c); uv.Add(vc.Tex.X); uv.Add(1-vc.Tex.Y);
-                            face.Add(b); uv.Add(vb.Tex.X); uv.Add(1-vb.Tex.Y);
+                            face.Add(a); uv.Add(va.Tex.x); uv.Add(1-va.Tex.y);
+                            face.Add(c); uv.Add(vc.Tex.x); uv.Add(1-vc.Tex.y);
+                            face.Add(b); uv.Add(vb.Tex.x); uv.Add(1-vb.Tex.y);
                             mtl.Add(j.spec);
                         }
                     }
@@ -229,6 +235,105 @@ namespace tso2mqo
                               mtl[j/3]);
                 tw.WriteLine("	}");
                 tw.WriteLine("}");
+            }
+
+            // ボーンを出す
+            switch(BoneMode)
+            {
+            case MqoBoneMode.None:      break;
+            case MqoBoneMode.RokDeBone:
+                {
+                // マトリクス計算
+                foreach(TSONode i in file.nodes)
+                {
+                    if(i.parent == null)
+                            i.world = i.Matrix;
+                    else    i.world = Matrix44.Mul(i.Matrix, i.parent.World);
+                }
+                
+#if false
+                // 位置一覧
+                Dictionary<string, Point3>  pointmap= new Dictionary<string, Point3>();
+                Dictionary<string, int>     indexmap= new Dictionary<string, int();
+
+                foreach(TSONode i in file.nodes)
+                {
+                    points.Add(i.World.Translation);
+                    pointmap.Add(i.name, i.World.Translation);
+                }
+
+              //RDBBonFile                  bonfile = new RDBBonFile();
+#endif
+                List<Point3>                points  = new List<Point3>();
+                List<int>                   bones   = new List<int>();
+
+                tw.WriteLine("Object \"{0}\" {{", "Bone");
+#if true
+                tw.WriteLine("	visible {0}", 15);
+                tw.WriteLine("	locking {0}", 0);
+                tw.WriteLine("	shading {0}", 1);
+                tw.WriteLine("	facet {0}", 59.5);
+                tw.WriteLine("	color {0} {1} {2}", 1, 0, 0);
+                tw.WriteLine("	color_type {0}", 0);
+#else
+                tw.WriteLine("	depth {0}", 0);
+	            tw.WriteLine("	folding {0}", 0);
+	            tw.WriteLine("	scale {0} {1} {2}", 1.000000, 1.000000, 1.000000);
+	            tw.WriteLine("	rotation {0} {1} {2}", 0.000000, 0.000000, 0.000000);
+	            tw.WriteLine("	translation {0} {1} {2}", 0.000000, 0.000000, 0.000000);
+	            tw.WriteLine("	visible {0}", 15);
+	            tw.WriteLine("	locking {0}", 0);
+	            tw.WriteLine("	shading {0}", 1);
+	            tw.WriteLine("	facet {0}", 59.5);
+	            tw.WriteLine("	color {0} {1} {2}", 0.898, 0.498, 0.698);
+	            tw.WriteLine("	color_type {0}", 0);
+#endif
+
+                foreach(TSONode i in file.nodes)
+                {
+                    if(i.children.Count == 0)
+                        continue;
+
+                    Point3  q   = new Point3(i.world.M41, i.world.M42, i.world.M43);
+                    Point3  p   = new Point3();
+                    
+                    foreach(TSONode j in i.children)
+                    {
+                        p.x     +=j.world.M41;
+                        p.y     +=j.world.M42;
+                        p.z     +=j.world.M43;
+                    }
+
+                    p.x         /=i.children.Count;
+                    p.y         /=i.children.Count;
+                    p.z         /=i.children.Count;
+
+                    bones.Add(points.Count); points.Add(q);
+                    bones.Add(points.Count); points.Add(p);
+                }
+
+                tw.WriteLine("	vertex {0} {{", points.Count);
+
+                foreach(Point3 j in points)
+                    WriteVertex(j.x, j.y, j.z);
+
+                tw.WriteLine("	}");
+
+                //
+                tw.WriteLine("	face {0} {{", bones.Count / 2);
+
+                for(int j= 0, n= bones.Count; j < n; j+=2)
+                    tw.WriteLine(string.Format("		2 V({0} {1})", bones[j+0], bones[j+1]));
+
+                tw.WriteLine("	}");
+                tw.WriteLine("}");
+                }
+                break;
+
+            case MqoBoneMode.Mikoto:
+                {
+                }
+                break;
             }
 
             tw.WriteLine("Eof");
