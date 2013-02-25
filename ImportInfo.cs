@@ -26,9 +26,39 @@ namespace Tso2MqoGui
             texturemap  = new Dictionary<string, ImportTextureInfo>();
             materialmap = new Dictionary<string, ImportMaterialInfo>();
 
-            foreach(ImportEffectInfo   i in effects)   effectmap  .Add(i.Name, i);
-            foreach(ImportTextureInfo  i in textures)  texturemap .Add(i.Name, i);
-            foreach(ImportMaterialInfo i in materials) materialmap.Add(i.Name, i);
+            foreach (ImportEffectInfo i in effects)
+            {
+                try
+                {
+                    effectmap.Add(i.Name, i);
+                }
+                catch (ArgumentException)
+                {
+                    throw new ArgumentException(string.Format(".xmlの記述に誤りがあります。Effect Name:{0} は既に追加されています。", i.Name));
+                }
+            }
+            foreach (ImportTextureInfo i in textures)
+            {
+                try
+                {
+                    texturemap.Add(i.Name, i);
+                }
+                catch (ArgumentException)
+                {
+                    throw new ArgumentException(string.Format(".xmlの記述に誤りがあります。Textures Name:{0} は既に追加されています。", i.Name));
+                }
+            }
+            foreach (ImportMaterialInfo i in materials)
+            {
+                try
+                {
+                    materialmap.Add(i.Name, i);
+                }
+                catch (ArgumentException)
+                {
+                    throw new ArgumentException(string.Format(".xmlの記述に誤りがあります。Materials Name:{0} は既に追加されています。", i.Name));
+                }
+            }
 
             foreach(ImportEffectInfo   i in effects)   i.PostLoad(this);
             foreach(ImportTextureInfo  i in textures)  i.PostLoad(this);
