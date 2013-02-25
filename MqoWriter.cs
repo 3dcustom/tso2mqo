@@ -56,12 +56,17 @@ namespace Tso2MqoGui
             tw  = null;
         }
 
-        string GetTexturePath(TSOTex tex)
+        string GetTextureFileName(TSOTex tex)
         {
             string filename = Path.GetFileName(tex.File.Trim('"'));
             if (filename == "")
                 filename = "none";
-            return Path.Combine(OutPath, filename);
+            return filename;
+        }
+
+        string GetTexturePath(TSOTex tex)
+        {
+            return Path.Combine(OutPath, GetTextureFileName(tex));
         }
 
         public void CreateTextureFile(TSOTex tex)
@@ -150,7 +155,7 @@ namespace Tso2MqoGui
                     TSOTex  tex = file.texturemap[mat.ColorTex];
                     tw.WriteLine(
                         "\t\"{0}\" col(1.000 1.000 1.000 1.000) dif(0.800) amb(0.600) emi(0.000) spc(0.000) power(5.00) tex(\"{1}\")",
-                        mat.name, GetTexturePath(tex));
+                        mat.name, GetTextureFileName(tex));
                 } else
                 {
                     tw.WriteLine(
