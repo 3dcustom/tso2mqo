@@ -29,10 +29,10 @@
         private void InitializeComponent()
         {
             this.lvMaterials = new System.Windows.Forms.ListView();
-            this.columnHeader1 = new System.Windows.Forms.ColumnHeader();
-            this.columnHeader2 = new System.Windows.Forms.ColumnHeader();
-            this.columnHeader3 = new System.Windows.Forms.ColumnHeader();
-            this.columnHeader4 = new System.Windows.Forms.ColumnHeader();
+            this.columnHeader1 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader2 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader3 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader4 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.label1 = new System.Windows.Forms.Label();
             this.pgMaterial = new System.Windows.Forms.PropertyGrid();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
@@ -68,17 +68,17 @@
             // 
             // columnHeader2
             // 
-            this.columnHeader2.Text = "カラーテクスチャ";
+            this.columnHeader2.Text = "テクスチャ：カラー";
             this.columnHeader2.Width = 216;
             // 
             // columnHeader3
             // 
-            this.columnHeader3.Text = "シェーディングテクスチャ";
+            this.columnHeader3.Text = "テクスチャ：シェーディング";
             this.columnHeader3.Width = 216;
             // 
             // columnHeader4
             // 
-            this.columnHeader4.Text = "シェーダー設定";
+            this.columnHeader4.Text = "シェーダー設定ファイル";
             this.columnHeader4.Width = 216;
             // 
             // label1
@@ -89,7 +89,7 @@
             this.label1.Size = new System.Drawing.Size(531, 24);
             this.label1.TabIndex = 1;
             this.label1.Text = "以下のマテリアルの情報を確認して、必要な場合、修正してください。\r\nファイル名が空白になっている部分に正しいファイルを設定しない場合、正しくエクスポートされない場" +
-                "合があります。";
+    "合があります。";
             // 
             // pgMaterial
             // 
@@ -102,9 +102,9 @@
             // 
             // splitContainer1
             // 
-            this.splitContainer1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-                        | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
+            this.splitContainer1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.splitContainer1.Location = new System.Drawing.Point(12, 36);
             this.splitContainer1.Name = "splitContainer1";
             this.splitContainer1.Orientation = System.Windows.Forms.Orientation.Horizontal;

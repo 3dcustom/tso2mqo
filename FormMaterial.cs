@@ -33,22 +33,31 @@ namespace Tso2MqoGui
 
         private void bOk_Click(object sender, EventArgs e)
         {
+            string error_message = null;
+
             // 正しく情報が設定されているかをチェックする
-            foreach(ListViewItem i in lvMaterials.Items)
+            foreach (ListViewItem item in lvMaterials.Items)
             {
-                if(i.SubItems[1].Text == ""
-                || i.SubItems[2].Text == ""
-                || i.SubItems[3].Text == ""
-                || !File.Exists(i.SubItems[1].Text)
-                || !File.Exists(i.SubItems[2].Text)
-                || !File.Exists(i.SubItems[3].Text))
+                string material_name = item.Text;
+
+                for (int i = 1; i < 4; i++)
                 {
-                    MessageBox.Show("マテリアルの情報が正しく設定されていないか、ファイルが存在しません");
-                    i.Selected  = true;
-                    return;
+                    string column_name = lvMaterials.Columns[i].Text;
+                    string text = item.SubItems[i].Text;
+
+                    if (text == "")
+                        error_message = string.Format("マテリアル名 {0} の {1} を設定する必要があります。", material_name, column_name);
+                    else if (!File.Exists(text))
+                        error_message = string.Format("マテリアル名 {0} の {1} は存在しません。", material_name, column_name);
+
+                    if (error_message != null)
+                    {
+                        MessageBox.Show(error_message);
+                        item.Selected = true;
+                        return;
+                    }
                 }
             }
-
 
             DialogResult    = DialogResult.OK;
             Hide();
