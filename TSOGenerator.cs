@@ -472,8 +472,16 @@ namespace Tso2MqoGui
                 uint                idx     = 0x00000000;
                 Point4              wgt     = new Point4(1, 0, 0, 0);
                 int[]               bones   = new int[1];
-                string              bone    = ObjectBoneNames[i.name];
-                bones[0]                    = nodes[bone].ID;
+                string              bone;
+                try
+                {
+                    bone = ObjectBoneNames[i.name];
+                }
+                catch (KeyNotFoundException)
+                {
+                    throw new KeyNotFoundException(string.Format("ボーン指定に誤りがあります。オブジェクト {0} にボーンを割り当てる必要があります。", i.name));
+                }
+                bones[0] = nodes[bone].ID;
 
                 // マテリアル別に処理を実行
                 List<ushort>        indices = new List<ushort>();
