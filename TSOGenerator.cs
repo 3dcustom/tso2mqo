@@ -138,8 +138,11 @@ namespace Tso2MqoGui
                 string  file= i.file;
                 string  name= i.name;
 
+                string file_directory_name = Path.GetDirectoryName(file);
+                string file_name = Path.GetFileName(file);
+
                 WriteString(bw, name);
-                WriteString(bw, "\"" + Path.GetFileName(file) + "\"");
+                WriteString(bw, "\"" + file_name + "\"");
 
                 // テクスチャの読み込み
                 TSOTex  tex = LoadTex(file);
@@ -153,9 +156,9 @@ namespace Tso2MqoGui
                 ii.textures.Add(iti);
 
                 // テクスチャが同じフォルダにない場合、コピーしておく
-                if(Path.GetDirectoryName(file).ToUpper() != dir.ToUpper())
+                if (file_directory_name != "" && file_directory_name.ToUpper() != dir.ToUpper())
                 {
-                    iti.File    = Path.Combine(dir, Path.GetFileName(file));
+                    iti.File    = Path.Combine(dir, file_name);
                     File.Copy(file, iti.File, true);
                 }
             }
