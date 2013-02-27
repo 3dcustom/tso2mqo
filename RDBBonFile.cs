@@ -7,13 +7,13 @@ namespace Tso2MqoGui
 {
     public class RDBJoint
     {
-        public int      No;
-        public string   Name;
+        public int No;
+        public string Name;
 
         public RDBJoint(int no, string name)
         {
-            No  = no;
-            Name= name;
+            No = no;
+            Name = name;
         }
 
         public override string ToString()
@@ -24,32 +24,32 @@ namespace Tso2MqoGui
 
     public class RDBBone
     {
-        public int      Begin;
-        public int      End;
+        public int Begin;
+        public int End;
 
         public RDBBone(int begin, int end)
         {
-            Begin   = begin;
-            End     = end;
+            Begin = begin;
+            End = end;
         }
 
         public override string ToString()
         {
             return "0003," + Begin.ToString().PadLeft(4, '0')
-                     + "," + End  .ToString().PadLeft(4, '0');
+                     + "," + End.ToString().PadLeft(4, '0');
         }
     }
 
     public class RDBBonFile
     {
-        public int                          no      = 0;
-        public List<RDBJoint>               joints  = new List<RDBJoint>();
-        public Dictionary<string, RDBJoint> jointmap= new Dictionary<string, RDBJoint>();
-        public List<RDBBone>                bones   = new List<RDBBone>();
+        public int no = 0;
+        public List<RDBJoint> joints = new List<RDBJoint>();
+        public Dictionary<string, RDBJoint> jointmap = new Dictionary<string, RDBJoint>();
+        public List<RDBBone> bones = new List<RDBBone>();
 
         public void AddJoint(string name)
         {
-            RDBJoint    j   = new RDBJoint(no++, name);
+            RDBJoint j = new RDBJoint(no++, name);
             joints.Add(j);
             jointmap.Add(name, j);
         }
@@ -61,13 +61,13 @@ namespace Tso2MqoGui
 
         public void Save(string file)
         {
-            StringBuilder   sb  = new StringBuilder();
+            StringBuilder sb = new StringBuilder();
 
             sb.AppendLine("BoneFile : type separated : ver1001")
               .AppendLine("")
               .AppendLine("NAMEPART_START");
 
-            foreach(RDBJoint i in joints)
+            foreach (RDBJoint i in joints)
                 sb.AppendLine(i.ToString());
 
             sb.AppendLine("NAMEPART_END")
@@ -76,9 +76,9 @@ namespace Tso2MqoGui
               .AppendLine("TREEPART_START")
               .AppendLine("");
 
-            foreach(RDBBone i in bones)
+            foreach (RDBBone i in bones)
                 sb.AppendLine(i.ToString());
-            
+
             sb.AppendLine("TREEPART_END");
 
             File.WriteAllText(file, sb.ToString(), Encoding.Default);

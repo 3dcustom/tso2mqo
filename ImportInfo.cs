@@ -9,21 +9,25 @@ namespace Tso2MqoGui
     [XmlRoot("TsoImportInfo")]
     public class ImportInfo
     {
-        [XmlIgnore] public string filename;
-        [XmlElement("Effect")]    public List<ImportEffectInfo>     effects     = new List<ImportEffectInfo>();
-        [XmlElement("Textures")]  public List<ImportTextureInfo>    textures    = new List<ImportTextureInfo>();
-        [XmlElement("Materials")] public List<ImportMaterialInfo>   materials   = new List<ImportMaterialInfo>();
-        
-        private Dictionary<string, ImportEffectInfo>    effectmap;
-        private Dictionary<string, ImportTextureInfo>   texturemap;
-        private Dictionary<string, ImportMaterialInfo>  materialmap;
+        [XmlIgnore]
+        public string filename;
+        [XmlElement("Effect")]
+        public List<ImportEffectInfo> effects = new List<ImportEffectInfo>();
+        [XmlElement("Textures")]
+        public List<ImportTextureInfo> textures = new List<ImportTextureInfo>();
+        [XmlElement("Materials")]
+        public List<ImportMaterialInfo> materials = new List<ImportMaterialInfo>();
 
-        public static Type      Type            { get { return typeof(ImportInfo); } }
+        private Dictionary<string, ImportEffectInfo> effectmap;
+        private Dictionary<string, ImportTextureInfo> texturemap;
+        private Dictionary<string, ImportMaterialInfo> materialmap;
+
+        public static Type Type { get { return typeof(ImportInfo); } }
 
         public void PostLoad()
         {
-            effectmap   = new Dictionary<string, ImportEffectInfo>();
-            texturemap  = new Dictionary<string, ImportTextureInfo>();
+            effectmap = new Dictionary<string, ImportEffectInfo>();
+            texturemap = new Dictionary<string, ImportTextureInfo>();
             materialmap = new Dictionary<string, ImportMaterialInfo>();
 
             foreach (ImportEffectInfo i in effects)
@@ -60,38 +64,41 @@ namespace Tso2MqoGui
                 }
             }
 
-            foreach(ImportEffectInfo   i in effects)   i.PostLoad(this);
-            foreach(ImportTextureInfo  i in textures)  i.PostLoad(this);
-            foreach(ImportMaterialInfo i in materials) i.PostLoad(this);
+            foreach (ImportEffectInfo i in effects)
+                i.PostLoad(this);
+            foreach (ImportTextureInfo i in textures)
+                i.PostLoad(this);
+            foreach (ImportMaterialInfo i in materials)
+                i.PostLoad(this);
         }
 
         public ImportEffectInfo GetEffect(string name)
         {
-            ImportEffectInfo    info= null;
+            ImportEffectInfo info = null;
             effectmap.TryGetValue(name, out info);
             return info;
         }
 
         public ImportTextureInfo GetTexture(string name)
         {
-            ImportTextureInfo   info= null;
+            ImportTextureInfo info = null;
             texturemap.TryGetValue(name, out info);
             return info;
         }
 
         public ImportMaterialInfo GetMaterial(string name)
         {
-            ImportMaterialInfo  info= null;
+            ImportMaterialInfo info = null;
             materialmap.TryGetValue(name, out info);
             return info;
         }
 
         public static ImportInfo Load(string file)
         {
-            using(FileStream fs= File.OpenRead(file))
+            using (FileStream fs = File.OpenRead(file))
             {
-                ImportInfo  ii  = new XmlSerializer(Type).Deserialize(fs) as ImportInfo;
-                ii.filename     = file;
+                ImportInfo ii = new XmlSerializer(Type).Deserialize(fs) as ImportInfo;
+                ii.filename = file;
                 ii.PostLoad();
                 return ii;
             }
@@ -99,7 +106,7 @@ namespace Tso2MqoGui
 
         public static void Save(string file, ImportInfo ii)
         {
-            using(FileStream fs= File.OpenWrite(file))
+            using (FileStream fs = File.OpenWrite(file))
             {
                 fs.SetLength(0);
                 new XmlSerializer(Type).Serialize(fs, ii);
@@ -109,17 +116,19 @@ namespace Tso2MqoGui
 
     public class ImportInfoItem
     {
-        [XmlIgnore] protected ImportInfo    Owner;
+        [XmlIgnore]
+        protected ImportInfo Owner;
 
         public virtual void PostLoad(ImportInfo owner)
         {
-            this.Owner  = owner;
+            this.Owner = owner;
         }
     }
 
     public class ImportEffectInfo : ImportInfoItem
     {
-        [XmlAttribute] public string   Name;
+        [XmlAttribute]
+        public string Name;
 
         public ImportEffectInfo()
         {
@@ -127,7 +136,7 @@ namespace Tso2MqoGui
 
         public ImportEffectInfo(TSOEffect eff)
         {
-            Name            = eff.Name;
+            Name = eff.Name;
         }
 
         public override string ToString()
@@ -138,11 +147,16 @@ namespace Tso2MqoGui
 
     public class ImportTextureInfo : ImportInfoItem
     {
-        [XmlAttribute] public string   Name;
-        [XmlAttribute] public string   File;
-        [XmlAttribute] public int      BytesPerPixel;
-        [XmlAttribute] public int      Width;
-        [XmlAttribute] public int      Height;
+        [XmlAttribute]
+        public string Name;
+        [XmlAttribute]
+        public string File;
+        [XmlAttribute]
+        public int BytesPerPixel;
+        [XmlAttribute]
+        public int Width;
+        [XmlAttribute]
+        public int Height;
 
         public ImportTextureInfo()
         {
@@ -150,66 +164,71 @@ namespace Tso2MqoGui
 
         public ImportTextureInfo(TSOTex tex)
         {
-            Name            = tex.Name;
-            File            = tex.File.Trim('"');
-            BytesPerPixel   = tex.Depth;
-            Width           = tex.Width;
-            Height          = tex.Height;
+            Name = tex.Name;
+            File = tex.File.Trim('"');
+            BytesPerPixel = tex.Depth;
+            Width = tex.Width;
+            Height = tex.Height;
         }
 
         public override string ToString()
         {
-            return "Name:"          + Name
-                +", File:"          + File
-                +", BytesPerPixel:" + BytesPerPixel
-                +", Width:"         + Width
-                +", Height:"        + Height
+            return "Name:" + Name
+                + " File:" + File
+                + " BytesPerPixel:" + BytesPerPixel
+                + " Width:" + Width
+                + " Height:" + Height
                 ;
         }
     }
 
     public class ImportMaterialInfo : ImportInfoItem
     {
-        [XmlAttribute] public string   Name;
-        [XmlAttribute] public string   File;
-        [XmlIgnore]    public Dictionary<string, string>    parameters;
-        [XmlIgnore]    public ImportTextureInfo             color;
-        [XmlIgnore]    public ImportTextureInfo             shadow;
+        [XmlAttribute]
+        public string Name;
+        [XmlAttribute]
+        public string File;
+        [XmlIgnore]
+        public Dictionary<string, string> parameters;
+        [XmlIgnore]
+        public ImportTextureInfo ColorTex;
+        [XmlIgnore]
+        public ImportTextureInfo ShadeTex;
 
         public ImportMaterialInfo()
         {
         }
 
-        public ImportMaterialInfo(TSOMaterial mtl)
+        public ImportMaterialInfo(TSOMaterial mat)
         {
-            Name            = mtl.Name;
-            File            = mtl.File.Trim('"');
+            Name = mat.Name;
+            File = mat.File.Trim('"');
         }
 
         public override void PostLoad(ImportInfo owner)
         {
             base.PostLoad(owner);
 
-            string  dir     = Path.GetDirectoryName(owner.filename);
-            string  codefile= Path.Combine(dir, Name);
+            string dir = Path.GetDirectoryName(owner.filename);
+            string codefile = Path.Combine(dir, Name);
 
-            if(System.IO.File.Exists(codefile))
+            if (System.IO.File.Exists(codefile))
             {
-                TSOMaterialCode code= TSOMaterialCode.GenerateFromFile(codefile);
-                TSOParameter    p;
+                TSOMaterialCode code = TSOMaterialCode.GenerateFromFile(codefile);
+                TSOParameter p;
 
-                if(code.TryGetValue("ColorTex", out p))
-                    color   = owner.GetTexture(p.Value);
+                if (code.TryGetValue("ColorTex", out p))
+                    ColorTex = owner.GetTexture(p.Value);
 
-                if(code.TryGetValue("ShadeTex", out p))
-                    shadow  = owner.GetTexture(p.Value);
+                if (code.TryGetValue("ShadeTex", out p))
+                    ShadeTex = owner.GetTexture(p.Value);
             }
         }
 
         public override string ToString()
         {
-            return "Name:"          + Name
-                +", File:"          + File
+            return "Name:" + Name
+                + " File:" + File
                 ;
         }
     }

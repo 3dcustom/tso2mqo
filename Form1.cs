@@ -12,10 +12,10 @@ namespace Tso2MqoGui
 {
     public partial class Form1 : Form
     {
-        public string   OutPath
+        public string OutPath
         {
             get { return tbPath.Text; }
-            set { tbPath.Text= value; }
+            set { tbPath.Text = value; }
         }
 
         public Form1()
@@ -40,16 +40,16 @@ namespace Tso2MqoGui
             cbCopyTSO.Checked = (int)reg.GetValue("CopyTSO", 1) == 1;
             cbShowMaterials.Checked = (int)reg.GetValue("ShowMaterials", 0) == 1;
 
-            reg             = Application.UserAppDataRegistry.CreateSubKey("Form1");
-            Bounds          = new Rectangle(
-                (int)reg.GetValue("Left",     0),
-                (int)reg.GetValue("Top",      0),
-                (int)reg.GetValue("Width",  640),
+            reg = Application.UserAppDataRegistry.CreateSubKey("Form1");
+            Bounds = new Rectangle(
+                (int)reg.GetValue("Left", 0),
+                (int)reg.GetValue("Top", 0),
+                (int)reg.GetValue("Width", 640),
                 (int)reg.GetValue("Height", 320));
 
             EnableControlStuff();
 
-            Config  config  = Config.Instance;
+            Config config = Config.Instance;
         }
 
         private void Form1_FormClosed(object sender, FormClosedEventArgs e)
@@ -69,19 +69,20 @@ namespace Tso2MqoGui
             reg.SetValue("CopyTSO", cbCopyTSO.Checked ? 1 : 0);
             reg.SetValue("ShowMaterials", cbShowMaterials.Checked ? 1 : 0);
 
-            reg= Application.UserAppDataRegistry.CreateSubKey("Form1");
+            reg = Application.UserAppDataRegistry.CreateSubKey("Form1");
 
-            if((this.WindowState & FormWindowState.Minimized) == FormWindowState.Minimized)
+            if ((this.WindowState & FormWindowState.Minimized) == FormWindowState.Minimized)
             {
-                reg.SetValue("Top",    RestoreBounds.Top);
-                reg.SetValue("Left",   RestoreBounds.Left);
-                reg.SetValue("Width",  RestoreBounds.Width);
+                reg.SetValue("Top", RestoreBounds.Top);
+                reg.SetValue("Left", RestoreBounds.Left);
+                reg.SetValue("Width", RestoreBounds.Width);
                 reg.SetValue("Height", RestoreBounds.Height);
-            } else
+            }
+            else
             {
-                reg.SetValue("Top",    Top);
-                reg.SetValue("Left",   Left);
-                reg.SetValue("Width",  Width);
+                reg.SetValue("Top", Top);
+                reg.SetValue("Left", Left);
+                reg.SetValue("Width", Width);
                 reg.SetValue("Height", Height);
             }
 
@@ -92,71 +93,72 @@ namespace Tso2MqoGui
         {
             try
             {
-                if(!e.Data.GetDataPresent(DataFormats.FileDrop))
+                if (!e.Data.GetDataPresent(DataFormats.FileDrop))
                     return;
 
-                string[]    files   = (string[])e.Data.GetData(DataFormats.FileDrop);
+                string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
 
-                if(files.Length == 0)
+                if (files.Length == 0)
                     return;
 
-                switch(tabControl1.SelectedIndex)
+                switch (tabControl1.SelectedIndex)
                 {
-                case 0:
-                    foreach(string i in files)
-                    {
-                        if(Path.GetExtension(i).ToUpper() == ".TSO")
-                            OpenTSOFile(i);
-                    }
+                    case 0:
+                        foreach (string i in files)
+                        {
+                            if (Path.GetExtension(i).ToUpper() == ".TSO")
+                                OpenTSOFile(i);
+                        }
 
-                    break;
+                        break;
 
-                case 1:
-                    switch (Path.GetExtension(files[0]).ToUpper())
-                    {
-                        case ".TSO": tbTsoFileRef.Text = files[0]; break;
-                        case ".MQO": tbMqoFile.Text = files[0]; break;
-                    }
+                    case 1:
+                        switch (Path.GetExtension(files[0]).ToUpper())
+                        {
+                            case ".TSO": tbTsoFileRef.Text = files[0]; break;
+                            case ".MQO": tbMqoFile.Text = files[0]; break;
+                        }
 
-                    break;
+                        break;
 
-                case 2:
-                    AddMergeTso(files);
-                    break;
+                    case 2:
+                        AddMergeTso(files);
+                        break;
                 }
-            } catch(Exception ex)
+            }
+            catch (Exception exception)
             {
-                Util.ProcessError(ex);
+                Util.ProcessError(exception);
             }
         }
 
         private void Form1_DragEnter(object sender, DragEventArgs e)
         {
-            if(!e.Data.GetDataPresent(DataFormats.FileDrop))
+            if (!e.Data.GetDataPresent(DataFormats.FileDrop))
                 return;
 
-            e.Effect    = DragDropEffects.Copy;
+            e.Effect = DragDropEffects.Copy;
         }
 
         private void tbMergeTso_DragDrop(object sender, DragEventArgs e)
         {
-            if(!e.Data.GetDataPresent(DataFormats.FileDrop))
+            if (!e.Data.GetDataPresent(DataFormats.FileDrop))
                 return;
 
-            string[]    files   = (string[])e.Data.GetData(DataFormats.FileDrop);
+            string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
 
-            switch(Path.GetExtension(files[0]).ToUpper())
+            switch (Path.GetExtension(files[0]).ToUpper())
             {
-            case ".TSO":    tbMergeTso.Text= files[0];  break;
+                case ".TSO": tbMergeTso.Text = files[0]; break;
             }
         }
 
         private void tbMergeTso_DragEnter(object sender, DragEventArgs e)
         {
-            if(!e.Data.GetDataPresent(DataFormats.FileDrop))
+            if (!e.Data.GetDataPresent(DataFormats.FileDrop))
                 return;
 
-            e.Effect    = DragDropEffects.Copy;
+            e.Effect = DragDropEffects.Copy;
         }
 
         private void OpenTSOFile(string file)
@@ -196,21 +198,21 @@ namespace Tso2MqoGui
                     ImportInfo ii = new ImportInfo();
 
                     // テクスチャ情報
-                    foreach (TSOTex i in tso.textures)
-                        ii.textures.Add(new ImportTextureInfo(i));
+                    foreach (TSOTex tex in tso.textures)
+                        ii.textures.Add(new ImportTextureInfo(tex));
 
                     // エフェクトの作成
-                    foreach (TSOEffect i in tso.effects)
+                    foreach (TSOEffect effect in tso.effects)
                     {
-                        ii.effects.Add(new ImportEffectInfo(i));
-                        File.WriteAllText(Path.Combine(dir, i.Name), i.code, Encoding.Default);
+                        ii.effects.Add(new ImportEffectInfo(effect));
+                        File.WriteAllText(Path.Combine(dir, effect.Name), effect.code, Encoding.Default);
                     }
 
                     // マテリアルの作成
-                    foreach (TSOMaterial i in tso.materials)
+                    foreach (TSOMaterial mat in tso.materials)
                     {
-                        ii.materials.Add(new ImportMaterialInfo(i));
-                        File.WriteAllText(Path.Combine(dir, i.Name), i.code, Encoding.Default);
+                        ii.materials.Add(new ImportMaterialInfo(mat));
+                        File.WriteAllText(Path.Combine(dir, mat.Name), mat.code, Encoding.Default);
                     }
 
                     ImportInfo.Save(importinfo_path, ii);
@@ -244,38 +246,38 @@ namespace Tso2MqoGui
                 gen.Generate(file, tbTsoFileRef.Text, tbTsoFile.Text);
             }
             else
-            if (rbOneBone.Checked)
-            {
-                TSOGeneratorOneBone gen = new TSOGeneratorOneBone(config);
-
-                foreach (ListViewItem i in lvObjects.Items)
+                if (rbOneBone.Checked)
                 {
-                    if (i.SubItems[1].Text == "")
+                    TSOGeneratorOneBone gen = new TSOGeneratorOneBone(config);
+
+                    foreach (ListViewItem item in lvObjects.Items)
                     {
-                        MessageBox.Show("すべてのオブジェクトにボーンを設定してください");
-                        return;
+                        if (item.SubItems[1].Text == "")
+                        {
+                            MessageBox.Show("すべてのオブジェクトにボーンを設定してください");
+                            return;
+                        }
+
+                        gen.ObjectBoneNames.Add(item.SubItems[0].Text, item.SubItems[1].Text);
                     }
 
-                    gen.ObjectBoneNames.Add(i.SubItems[0].Text, i.SubItems[1].Text);
+                    gen.Generate(file, tbTsoFileRef.Text, tbTsoFile.Text);
                 }
-
-                gen.Generate(file, tbTsoFileRef.Text, tbTsoFile.Text);
-            }
-            else
-            {
-            }
+                else
+                {
+                }
         }
-#region tso->mqo UI
+        #region tso->mqo UI
         private void button1_Click(object sender, EventArgs e)
         {
             FolderBrowserDialog dlg = new FolderBrowserDialog();
-            dlg.SelectedPath    = OutPath;
+            dlg.SelectedPath = OutPath;
 
-            if(dlg.ShowDialog() == DialogResult.OK)
+            if (dlg.ShowDialog() == DialogResult.OK)
                 OutPath = dlg.SelectedPath;
         }
-#endregion
-#region mqo->tso UI
+        #endregion
+        #region mqo->tso UI
         private void radioButton1_CheckedChanged(object sender, EventArgs e)
         {
             EnableControlStuff();
@@ -288,29 +290,30 @@ namespace Tso2MqoGui
 
         private void EnableControlStuff()
         {
-            gbBone.Enabled  = rbOneBone.Checked;
+            gbBone.Enabled = rbOneBone.Checked;
         }
 
         private void BuildBoneTree(TreeNodeCollection nodes, TSONode node)
         {
-            TreeNode    tn  = nodes.Add(node.ShortName);
-            tn.Tag          = node;
+            TreeNode tn = nodes.Add(node.ShortName);
+            tn.Tag = node;
 
-            if(node.children != null)
-            foreach(TSONode i in node.children)
-                BuildBoneTree(tn.Nodes, i);
+            if (node.children != null)
+                foreach (TSONode i in node.children)
+                    BuildBoneTree(tn.Nodes, i);
         }
 
         private void SaveAssign()
         {
-            foreach(ListViewItem i in lvObjects.Items)
+            foreach (ListViewItem item in lvObjects.Items)
             {
-                string  obj = i.SubItems[0].Text;
-                string  bone= i.SubItems[1].Text;
+                string obj = item.SubItems[0].Text;
+                string bone = item.SubItems[1].Text;
 
-                if(Config.Instance.object_bone_map.ContainsKey(obj))
-                        Config.Instance.object_bone_map[obj]    = bone;
-                else    Config.Instance.object_bone_map.Add(obj, bone);
+                if (Config.Instance.object_bone_map.ContainsKey(obj))
+                    Config.Instance.object_bone_map[obj] = bone;
+                else
+                    Config.Instance.object_bone_map.Add(obj, bone);
             }
         }
 
@@ -325,9 +328,9 @@ namespace Tso2MqoGui
                 if (dlg.ShowDialog() == DialogResult.OK)
                     tbMqoFile.Text = dlg.FileName;
             }
-            catch (Exception ex)
+            catch (Exception exception)
             {
-                Util.ProcessError(ex);
+                Util.ProcessError(exception);
             }
         }
 
@@ -342,9 +345,9 @@ namespace Tso2MqoGui
                 if (dlg.ShowDialog() == DialogResult.OK)
                     tbTsoFileRef.Text = dlg.FileName;
             }
-            catch (Exception ex)
+            catch (Exception exception)
             {
-                Util.ProcessError(ex);
+                Util.ProcessError(exception);
             }
         }
 
@@ -359,9 +362,9 @@ namespace Tso2MqoGui
                 if (dlg.ShowDialog() == DialogResult.OK)
                     tbTsoFile.Text = dlg.FileName;
             }
-            catch (Exception ex)
+            catch (Exception exception)
             {
-                Util.ProcessError(ex);
+                Util.ProcessError(exception);
             }
         }
 
@@ -377,15 +380,16 @@ namespace Tso2MqoGui
                 mqo.Load(tbMqoFile.Text);
                 lvObjects.Items.Clear();
 
-                foreach (MqoObject i in mqo.Objects)
+                foreach (MqoObject obj in mqo.Objects)
                 {
-                    ListViewItem item = lvObjects.Items.Add(i.name);
-                    item.Tag = i;
+                    ListViewItem item = lvObjects.Items.Add(obj.name);
+                    item.Tag = obj;
                     string bone;
 
-                    if (Config.Instance.object_bone_map.TryGetValue(i.name, out bone))
+                    if (Config.Instance.object_bone_map.TryGetValue(obj.name, out bone))
                         item.SubItems.Add(bone);
-                    else item.SubItems.Add("");
+                    else
+                        item.SubItems.Add("");
                 }
 
                 // ボーン構造
@@ -397,9 +401,9 @@ namespace Tso2MqoGui
                 tvBones.ExpandAll();
                 tvBones.Nodes[0].EnsureVisible();
             }
-            catch (Exception ex)
+            catch (Exception exception)
             {
-                Util.ProcessError(ex);
+                Util.ProcessError(exception);
             }
             finally
             {
@@ -409,30 +413,30 @@ namespace Tso2MqoGui
 
         private void btnSelectAll_Click(object sender, EventArgs e)
         {
-            foreach (ListViewItem i in lvObjects.Items)
-                i.Selected = true;
+            foreach (ListViewItem item in lvObjects.Items)
+                item.Selected = true;
         }
 
         private void btnDeselectAll_Click(object sender, EventArgs e)
         {
-            foreach (ListViewItem i in lvObjects.Items)
-                i.Selected = false;
+            foreach (ListViewItem item in lvObjects.Items)
+                item.Selected = false;
         }
 
         private void btnAssign_Click(object sender, EventArgs e)
         {
             try
             {
-                TreeNode n = tvBones.SelectedNode;
+                TreeNode node = tvBones.SelectedNode;
 
-                if (n == null)
+                if (node == null)
                 {
                     MessageBox.Show("割り当てるボーンを選択してください");
                     return;
                 }
 
-                foreach (ListViewItem i in lvObjects.SelectedItems)
-                    i.SubItems[1].Text = n.Text;
+                foreach (ListViewItem item in lvObjects.SelectedItems)
+                    item.SubItems[1].Text = node.Text;
 
                 SaveAssign();
             }
@@ -453,38 +457,38 @@ namespace Tso2MqoGui
                 string file = tbMqoFile.Text;
                 OpenMQOFile(file);
             }
-            catch (Exception ex)
+            catch (Exception exception)
             {
-                Util.ProcessError(ex);
+                Util.ProcessError(exception);
             }
             finally
             {
                 tabPage2.BackColor = c;
             }
         }
-#endregion
-#region Merge UI
+        #endregion
+        #region Merge UI
         private void AddMergeTso(string[] files)
         {
-            foreach(string i in files)
+            foreach (string file in files)
             {
-                if(Path.GetExtension(files[0]).ToUpper() != ".TSO")
+                if (Path.GetExtension(files[0]).ToUpper() != ".TSO")
                     continue;
 
-                if(tvMerge.Nodes.Find(i, false).Length == 0)
+                if (tvMerge.Nodes.Find(file, false).Length == 0)
                 {
-                    TreeNode    node= tvMerge.Nodes.Add(i);
-                    node.Name       = i;
-                    node.Checked    = true;
+                    TreeNode node = tvMerge.Nodes.Add(file);
+                    node.Name = file;
+                    node.Checked = true;
 
-                    TSOFile     tso = new TSOFile(i);
+                    TSOFile tso = new TSOFile(file);
                     tso.ReadAll();
 
-                    foreach(TSOMesh j in tso.meshes)
+                    foreach (TSOMesh j in tso.meshes)
                     {
-                        TreeNode    mesh= node.Nodes.Add(j.Name);
-                        mesh.Name       = j.Name;
-                        mesh.Checked    = true;
+                        TreeNode mesh = node.Nodes.Add(j.Name);
+                        mesh.Name = j.Name;
+                        mesh.Checked = true;
                     }
                 }
             }
@@ -502,45 +506,45 @@ namespace Tso2MqoGui
                 Dictionary<string, TSOTex> textures = new Dictionary<string, TSOTex>();
                 TSOFile last = null;
 
-                foreach (TreeNode i in tvMerge.Nodes)
+                foreach (TreeNode node in tvMerge.Nodes)
                 {
-                    TSOFile tso = new TSOFile(i.Text);
+                    TSOFile tso = new TSOFile(node.Text);
                     last = tso;
                     ulong mtls = 0;
                     ulong mask = 1;
                     tso.ReadAll();
 
-                    foreach (TSOMesh j in tso.meshes)
+                    foreach (TSOMesh mesh in tso.meshes)
                     {
-                        TreeNode[] found = i.Nodes.Find(j.Name, false);
+                        TreeNode[] found = node.Nodes.Find(mesh.Name, false);
 
                         if (found.Length == 0 || !found[0].Checked)
                             continue;
 
-                        foreach (TSOSubMesh k in j.sub)
+                        foreach (TSOSubMesh k in mesh.sub_meshes)
                             mtls |= 1ul << k.spec;
 
-                        meshes.Add(j);
+                        meshes.Add(mesh);
                     }
 
-                    foreach (TSOMaterial j in tso.materials)
+                    foreach (TSOMaterial mat in tso.materials)
                     {
                         if ((mask & mtls) != 0)
                         {
-                            if (!materialmap.ContainsKey(j.Name))
+                            if (!materialmap.ContainsKey(mat.Name))
                             {
-                                Pair<TSOMaterial, int> value = new Pair<TSOMaterial, int>(j, materialmap.Count);
-                                materialmap.Add(j.Name, value);
+                                Pair<TSOMaterial, int> value = new Pair<TSOMaterial, int>(mat, materialmap.Count);
+                                materialmap.Add(mat.Name, value);
 
-                                if (!textures.ContainsKey(j.ColorTex))
+                                if (!textures.ContainsKey(mat.ColorTex))
                                 {
-                                    TSOTex tex = tso.texturemap[j.ColorTex];
+                                    TSOTex tex = tso.texturemap[mat.ColorTex];
                                     textures.Add(tex.Name, tex);
                                 }
 
-                                if (!textures.ContainsKey(j.ShadeTex))
+                                if (!textures.ContainsKey(mat.ShadeTex))
                                 {
-                                    TSOTex tex = tso.texturemap[j.ShadeTex];
+                                    TSOTex tex = tso.texturemap[mat.ShadeTex];
                                     textures.Add(tex.Name, tex);
                                 }
                             }
@@ -560,17 +564,17 @@ namespace Tso2MqoGui
                     foreach (var i in materialmap.Values)
                         mtllist[i.Second] = i.First;
 
-                    foreach (TSOMesh i in meshes)
+                    foreach (TSOMesh mesh in meshes)
                     {
-                        foreach (TSOSubMesh j in i.sub)
+                        foreach (TSOSubMesh sub in mesh.sub_meshes)
                         {
-                            TSOMaterial mtl = i.file.materials[j.spec];
-                            j.spec = materialmap[mtl.Name].Second;
+                            TSOMaterial mtl = mesh.file.materials[sub.spec];
+                            sub.spec = materialmap[mtl.Name].Second;
                         }
                     }
 
-                    foreach (TSOTex i in texlist)
-                        TSOFile.ExchangeChannel(i.data, i.depth);
+                    foreach (TSOTex tex in texlist)
+                        TSOFile.ExchangeChannel(tex.data, tex.depth);
 
                     BinaryWriter bw = new BinaryWriter(fs);
                     TSOWriter.WriteHeader(bw);
@@ -581,9 +585,9 @@ namespace Tso2MqoGui
                     TSOWriter.Write(bw, meshes.ToArray());
                 }
             }
-            catch (Exception ex)
+            catch (Exception exception)
             {
-                Util.ProcessError(ex);
+                Util.ProcessError(exception);
             }
             finally
             {
@@ -595,15 +599,16 @@ namespace Tso2MqoGui
         {
             try
             {
-                OpenFileDialog  dlg = new OpenFileDialog();
-                dlg.Filter      = "TSO File(*.tso)|*.tso";
+                OpenFileDialog dlg = new OpenFileDialog();
+                dlg.Filter = "TSO File(*.tso)|*.tso";
                 dlg.Multiselect = true;
 
-                if(dlg.ShowDialog() == DialogResult.OK)
+                if (dlg.ShowDialog() == DialogResult.OK)
                     AddMergeTso(dlg.FileNames);
-            } catch(Exception ex)
+            }
+            catch (Exception exception)
             {
-                Util.ProcessError(ex);
+                Util.ProcessError(exception);
             }
         }
 
@@ -629,51 +634,51 @@ namespace Tso2MqoGui
                 if (dlg.ShowDialog() == DialogResult.OK)
                     tbMergeTso.Text = dlg.FileName;
             }
-            catch (Exception ex)
+            catch (Exception exception)
             {
-                Util.ProcessError(ex);
+                Util.ProcessError(exception);
             }
         }
 
-        public static bool  bTvMerge_AfterCheck = false;
+        public static bool bTvMerge_AfterCheck = false;
 
         private void tvMerge_AfterCheck(object sender, TreeViewEventArgs e)
         {
-            if(bTvMerge_AfterCheck)
+            if (bTvMerge_AfterCheck)
                 return;
 
             bTvMerge_AfterCheck = true;
 
             try
             {
-                if(e.Node.Level == 0)
+                if (e.Node.Level == 0)
                 {
-                    foreach(TreeNode i in e.Node.Nodes)
-                        i.Checked   = e.Node.Checked;
-                } else
-                {
-                    bool    check   = false;
-                  //bool    uncheck = false;
-
-                    foreach(TreeNode i in e.Node.Parent.Nodes)
-                    if(i.Checked)   check   = true;
-                  //else            uncheck = true;
-
-                    e.Node.Parent.Checked   = check;
+                    foreach (TreeNode node in e.Node.Nodes)
+                        node.Checked = e.Node.Checked;
                 }
-            } finally
+                else
+                {
+                    bool check = false;
+
+                    foreach (TreeNode node in e.Node.Parent.Nodes)
+                        if (node.Checked) check = true;
+
+                    e.Node.Parent.Checked = check;
+                }
+            }
+            finally
             {
                 bTvMerge_AfterCheck = false;
             }
         }
-#endregion
+        #endregion
     }
 
     public class Util
     {
-        public static void ProcessError(Exception e)
+        public static void ProcessError(Exception exception)
         {
-            MessageBox.Show(e.ToString());
+            MessageBox.Show(exception.ToString());
         }
     }
 }

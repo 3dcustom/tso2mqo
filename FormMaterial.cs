@@ -11,23 +11,23 @@ namespace Tso2MqoGui
 {
     public partial class FormMaterial : Form
     {
-        public Dictionary<string, MaterialInfo>    materials;
+        public Dictionary<string, MaterialInfo> materials;
 
         public FormMaterial()
         {
             InitializeComponent();
-            DialogResult    = DialogResult.Cancel;
+            DialogResult = DialogResult.Cancel;
         }
 
         private void FormMaterial_Load(object sender, EventArgs e)
         {
-            foreach(MaterialInfo i in materials.Values)
+            foreach (MaterialInfo mat_info in materials.Values)
             {
-                ListViewItem    item= lvMaterials.Items.Add(i.Name);
-                item.Tag            = i;
-                item.SubItems.Add(i.diffuse == null ? "" : i.diffuse);
-                item.SubItems.Add(i.shadow  == null ? "" : i.shadow);
-                item.SubItems.Add(i.shader  == null ? "" : i.shader);
+                ListViewItem item = lvMaterials.Items.Add(mat_info.Name);
+                item.Tag = mat_info;
+                item.SubItems.Add(mat_info.diffuse == null ? "" : mat_info.diffuse);
+                item.SubItems.Add(mat_info.shadow == null ? "" : mat_info.shadow);
+                item.SubItems.Add(mat_info.shader == null ? "" : mat_info.shader);
             }
         }
 
@@ -59,39 +59,46 @@ namespace Tso2MqoGui
                 }
             }
 
-            DialogResult    = DialogResult.OK;
+            DialogResult = DialogResult.OK;
             Hide();
         }
 
         private void bCancel_Click(object sender, EventArgs e)
         {
-            DialogResult    = DialogResult.Cancel;
+            DialogResult = DialogResult.Cancel;
             Hide();
         }
 
         private void lvMaterials_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if(lvMaterials.SelectedItems.Count > 0)
+            if (lvMaterials.SelectedItems.Count > 0)
             {
-                MaterialInfo    mi  = lvMaterials.SelectedItems[0].Tag as MaterialInfo;
-                pgMaterial.SelectedObject   = mi;
-            } else
+                MaterialInfo mat_info = lvMaterials.SelectedItems[0].Tag as MaterialInfo;
+                pgMaterial.SelectedObject = mat_info;
+            }
+            else
             {
-                pgMaterial.SelectedObject   = null;
+                pgMaterial.SelectedObject = null;
             }
         }
 
         private void pgMaterial_PropertyValueChanged(object s, PropertyValueChangedEventArgs e)
         {
-            if(lvMaterials.SelectedItems.Count > 0)
+            if (lvMaterials.SelectedItems.Count > 0)
             {
-                ListViewItem    item= lvMaterials.SelectedItems[0];
+                ListViewItem item = lvMaterials.SelectedItems[0];
 
-                switch(e.ChangedItem.PropertyDescriptor.Name)
+                switch (e.ChangedItem.PropertyDescriptor.Name)
                 {
-                case "DiffuseTexture":  item.SubItems[1].Text= e.ChangedItem.Value.ToString(); break;
-                case "ShadowTexture":   item.SubItems[2].Text= e.ChangedItem.Value.ToString(); break;
-                case "ShaderFile":      item.SubItems[3].Text= e.ChangedItem.Value.ToString(); break;
+                    case "DiffuseTexture":
+                        item.SubItems[1].Text = e.ChangedItem.Value.ToString();
+                        break;
+                    case "ShadowTexture":
+                        item.SubItems[2].Text = e.ChangedItem.Value.ToString();
+                        break;
+                    case "ShaderFile":
+                        item.SubItems[3].Text = e.ChangedItem.Value.ToString();
+                        break;
                 }
             }
         }

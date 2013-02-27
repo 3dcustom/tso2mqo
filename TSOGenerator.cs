@@ -108,9 +108,9 @@ namespace Tso2MqoGui
         {
             bw.Write(tsoref.nodes.Length);
 
-            nodes   = new Dictionary<string,TSONode>();
+            nodes = new Dictionary<string, TSONode>();
 
-            foreach(TSONode i in tsoref.nodes)
+            foreach (TSONode i in tsoref.nodes)
             {
                 WriteString(bw, i.Name);
                 nodes.Add(i.ShortName, i);
@@ -123,7 +123,7 @@ namespace Tso2MqoGui
         {
             bw.Write(tsoref.nodes.Length);
 
-            foreach(TSONode i in tsoref.nodes)
+            foreach (TSONode i in tsoref.nodes)
                 WriteMatrix(bw, i.Matrix);
 
             return true;
@@ -133,10 +133,10 @@ namespace Tso2MqoGui
         {
             bw.Write(textures.Count);
 
-            foreach(TextureInfo i in textures.Values)
+            foreach (TextureInfo tex_info in textures.Values)
             {
-                string  file= i.file;
-                string  name= i.name;
+                string file = tex_info.file;
+                string name = tex_info.name;
 
                 string file_directory_name = Path.GetDirectoryName(file);
                 string file_name = Path.GetFileName(file);
@@ -145,21 +145,21 @@ namespace Tso2MqoGui
                 WriteString(bw, "\"" + file_name + "\"");
 
                 // テクスチャの読み込み
-                TSOTex  tex = LoadTex(file);
-                tex.name    = name;
+                TSOTex tex = LoadTex(file);
+                tex.name = name;
                 bw.Write(tex.Width);
                 bw.Write(tex.Height);
                 bw.Write(tex.Depth);
                 bw.Write(tex.data, 0, tex.data.Length);
 
-                ImportTextureInfo   iti = new ImportTextureInfo(tex);
-                ii.textures.Add(iti);
+                ImportTextureInfo import_tex_info = new ImportTextureInfo(tex);
+                ii.textures.Add(import_tex_info);
 
                 // テクスチャが同じフォルダにない場合、コピーしておく
                 if (file_directory_name != "" && file_directory_name.ToUpper() != dir.ToUpper())
                 {
-                    iti.File    = Path.Combine(dir, file_name);
-                    File.Copy(file, iti.File, true);
+                    import_tex_info.File = Path.Combine(dir, file_name);
+                    File.Copy(file, import_tex_info.File, true);
                 }
             }
 
@@ -170,16 +170,16 @@ namespace Tso2MqoGui
         {
             bw.Write(ii.effects.Count);
 
-            foreach(ImportEffectInfo i in ii.effects)
+            foreach (ImportEffectInfo import_effect_info in ii.effects)
             {
-                string      file= Path.Combine(dir, i.Name);
-                string[]    code= File.ReadAllLines(file, Encoding.Default);
+                string file = Path.Combine(dir, import_effect_info.Name);
+                string[] code = File.ReadAllLines(file, Encoding.Default);
 
-                WriteString(bw, i.Name);
+                WriteString(bw, import_effect_info.Name);
                 bw.Write(code.Length);
 
-                foreach(string j in code)
-                    WriteString(bw, j.Trim('\r', '\n'));
+                foreach (string line in code)
+                    WriteString(bw, line.Trim('\r', '\n'));
             }
 
             return true;
@@ -189,25 +189,25 @@ namespace Tso2MqoGui
         {
             bw.Write(mqo.Materials.Count);
 
-            foreach(MqoMaterial i in mqo.Materials)
+            foreach (MqoMaterial mat in mqo.Materials)
             {
-                MaterialInfo    mi  = materials[i.name];
-                string[]        code= mi.GetCode();
+                MaterialInfo mat_info = materials[mat.name];
+                string[] code = mat_info.GetCode();
 
-                WriteString(bw, i.name);
+                WriteString(bw, mat.name);
                 WriteString(bw, "cgfxShader");
                 bw.Write(code.Length);
 
-                foreach(string j in code)
-                    WriteString(bw, j.Trim('\r', '\n'));
+                foreach (string line in code)
+                    WriteString(bw, line.Trim('\r', '\n'));
 
-                ImportMaterialInfo  imi = new ImportMaterialInfo();
-                imi.Name                = i.name;
-                imi.File                = "cgfxShader";
-                ii.materials.Add(imi);
+                ImportMaterialInfo import_mat_info = new ImportMaterialInfo();
+                import_mat_info.Name = mat.name;
+                import_mat_info.File = "cgfxShader";
+                ii.materials.Add(import_mat_info);
 
                 // コードを保存する
-                File.WriteAllLines(Path.Combine(dir, i.name), code);
+                File.WriteAllLines(Path.Combine(dir, mat.name), code);
             }
 
             return true;
@@ -217,25 +217,25 @@ namespace Tso2MqoGui
         {
             bw.Write(meshes.Count);
 
-            foreach(TSOMesh i in meshes)
+            foreach (TSOMesh mesh in meshes)
             {
-                WriteString(bw, i.Name);
-                WriteMatrix(bw, i.Matrix);
+                WriteString(bw, mesh.Name);
+                WriteMatrix(bw, mesh.Matrix);
                 bw.Write(1);
-                bw.Write(i.numsubs);
+                bw.Write(mesh.numsubs);
 
-                foreach(TSOSubMesh j in i.sub)
+                foreach (TSOSubMesh sub in mesh.sub_meshes)
                 {
-                    bw.Write(j.spec);
-                    bw.Write(j.numbones);
+                    bw.Write(sub.spec);
+                    bw.Write(sub.numbones);
 
-                    foreach(int k in j.bones)
-                        bw.Write(k);
+                    foreach (int i in sub.bones)
+                        bw.Write(i);
 
-                    bw.Write(j.numvertices);
+                    bw.Write(sub.numvertices);
 
-                    foreach(Vertex k in j.vertices)
-                        WriteVertex(bw, k);
+                    foreach (Vertex v in sub.vertices)
+                        WriteVertex(bw, v);
                 }
             }
 
@@ -309,13 +309,13 @@ namespace Tso2MqoGui
                 DoCleanup();
             }
         }
-        
+
         protected abstract bool DoLoadRefTSO(string tsoref);
 
-#region ユーティリティ
+        #region ユーティリティ
         public void WriteString(BinaryWriter bw, string s)
         {
-            byte[]  b   = Encoding.Default.GetBytes(s);
+            byte[] b = Encoding.Default.GetBytes(s);
             bw.Write(b);
             bw.Write((byte)0);
         }
@@ -330,15 +330,15 @@ namespace Tso2MqoGui
 
         public unsafe void WriteVertex(BinaryWriter bw, Vertex v)
         {
-            uint        idx0    = v.Idx;
-            byte*       idx     = (byte*)(&idx0);
-            List<int>   idxs    = new List<int>(4);
-            List<float> wgts    = new List<float>(4);
+            uint idx0 = v.Idx;
+            byte* idx = (byte*)(&idx0);
+            List<int> idxs = new List<int>(4);
+            List<float> wgts = new List<float>(4);
 
-            if(v.Wgt.x > 0) { idxs.Add(idx[0]); wgts.Add(v.Wgt.x); }
-            if(v.Wgt.y > 0) { idxs.Add(idx[1]); wgts.Add(v.Wgt.y); }
-            if(v.Wgt.z > 0) { idxs.Add(idx[2]); wgts.Add(v.Wgt.z); }
-            if(v.Wgt.w > 0) { idxs.Add(idx[3]); wgts.Add(v.Wgt.w); }
+            if (v.Wgt.x > 0) { idxs.Add(idx[0]); wgts.Add(v.Wgt.x); }
+            if (v.Wgt.y > 0) { idxs.Add(idx[1]); wgts.Add(v.Wgt.y); }
+            if (v.Wgt.z > 0) { idxs.Add(idx[2]); wgts.Add(v.Wgt.z); }
+            if (v.Wgt.w > 0) { idxs.Add(idx[3]); wgts.Add(v.Wgt.w); }
 
             bw.Write(v.Pos.X); bw.Write(v.Pos.Y); bw.Write(v.Pos.Z);
             bw.Write(v.Nrm.X); bw.Write(v.Nrm.Y); bw.Write(v.Nrm.Z);
@@ -346,86 +346,86 @@ namespace Tso2MqoGui
 
             bw.Write(wgts.Count);
 
-            for(int i= 0, n= idxs.Count; i < n; ++i)
+            for (int i = 0, n = idxs.Count; i < n; ++i)
             {
                 bw.Write(idxs[i]);
                 bw.Write(wgts[i]);
             }
         }
-#endregion
-#region テクスチャ処理
-        public TSOTex   LoadTex(string file)
+        #endregion
+        #region テクスチャ処理
+        public TSOTex LoadTex(string file)
         {
-            string  ext = Path.GetExtension(file).ToUpper();
-            TSOTex  tex;
+            string ext = Path.GetExtension(file).ToUpper();
+            TSOTex tex;
 
-            switch(ext)
+            switch (ext)
             {
-            case ".TGA":    tex= LoadTarga(file);   break;
-            case ".BMP":    tex= LoadBitmap(file);  break;
-            default:        throw new Exception("Unsupported texture file: " + file);
+                case ".TGA": tex = LoadTarga(file); break;
+                case ".BMP": tex = LoadBitmap(file); break;
+                default: throw new Exception("Unsupported texture file: " + file);
             }
 
-            for(int i= 0, n= tex.data.Length; i < n; i+=tex.Depth)
+            for (int i = 0, n = tex.data.Length; i < n; i += tex.Depth)
             {
-                byte    b       = tex.data[i+0];
-                tex.data[i+0]   = tex.data[i+2];
-                tex.data[i+2]   = b;
+                byte b = tex.data[i + 0];
+                tex.data[i + 0] = tex.data[i + 2];
+                tex.data[i + 2] = b;
             }
 
             return tex;
         }
 
-        public unsafe TSOTex   LoadTarga(string file)
+        public unsafe TSOTex LoadTarga(string file)
         {
-            using(FileStream fs= File.OpenRead(file))
+            using (FileStream fs = File.OpenRead(file))
             {
-                BinaryReader        br      = new BinaryReader(fs);
-                TARGA_HEADER        header;
+                BinaryReader br = new BinaryReader(fs);
+                TARGA_HEADER header;
 
                 Marshal.Copy(br.ReadBytes(sizeof(TARGA_HEADER)), 0, (IntPtr)(&header), sizeof(TARGA_HEADER));
 
-                if(header.imagetype != 0x02)    throw new Exception("Invalid imagetype: " + file);
-                if(header.depth     != 24
-                && header.depth     != 32)      throw new Exception("Invalid depth: " + file);
-                
-                TSOTex      tex = new TSOTex();
-                tex.depth       = header.depth  / 8;
-                tex.width       = header.width;
-                tex.height      = header.height;
-                tex.File        = file;
-                tex.data        = br.ReadBytes(tex.width * tex.height * tex.depth);
+                if (header.imagetype != 0x02) throw new Exception("Invalid imagetype: " + file);
+                if (header.depth != 24
+                && header.depth != 32) throw new Exception("Invalid depth: " + file);
+
+                TSOTex tex = new TSOTex();
+                tex.depth = header.depth / 8;
+                tex.width = header.width;
+                tex.height = header.height;
+                tex.File = file;
+                tex.data = br.ReadBytes(tex.width * tex.height * tex.depth);
 
                 return tex;
             }
         }
 
-        public unsafe TSOTex   LoadBitmap(string file)
+        public unsafe TSOTex LoadBitmap(string file)
         {
-            using(FileStream fs= File.OpenRead(file))
+            using (FileStream fs = File.OpenRead(file))
             {
-                BinaryReader        br      = new BinaryReader(fs);
-                BITMAPFILEHEADER    bfh;
-                BITMAPINFOHEADER    bih;
+                BinaryReader br = new BinaryReader(fs);
+                BITMAPFILEHEADER bfh;
+                BITMAPINFOHEADER bih;
 
                 Marshal.Copy(br.ReadBytes(sizeof(BITMAPFILEHEADER)), 0, (IntPtr)(&bfh), sizeof(BITMAPFILEHEADER));
                 Marshal.Copy(br.ReadBytes(sizeof(BITMAPINFOHEADER)), 0, (IntPtr)(&bih), sizeof(BITMAPINFOHEADER));
 
-                if(bfh.bfType != 0x4D42)        throw new Exception("Invalid imagetype: " + file);
-                if(bih.biBitCount != 24
-                && bih.biBitCount != 32)        throw new Exception("Invalid depth: " + file);
-                
-                TSOTex      tex = new TSOTex();
-                tex.depth       = bih.biBitCount  / 8;
-                tex.width       = bih.biWidth;
-                tex.height      = bih.biHeight;
-                tex.File        = file;
-                tex.data        = br.ReadBytes(tex.width * tex.height * tex.depth);
+                if (bfh.bfType != 0x4D42) throw new Exception("Invalid imagetype: " + file);
+                if (bih.biBitCount != 24
+                && bih.biBitCount != 32) throw new Exception("Invalid depth: " + file);
+
+                TSOTex tex = new TSOTex();
+                tex.depth = bih.biBitCount / 8;
+                tex.width = bih.biWidth;
+                tex.height = bih.biHeight;
+                tex.File = file;
+                tex.data = br.ReadBytes(tex.width * tex.height * tex.depth);
 
                 return tex;
             }
         }
-#endregion
+        #endregion
     }
 
     public class TSOGeneratorOneBone : TSOGenerator
@@ -446,90 +446,89 @@ namespace Tso2MqoGui
 
         protected override bool DoGenerateMeshes()
         {
-            meshes  = new List<TSOMesh>();
+            meshes = new List<TSOMesh>();
 
-            foreach(MqoObject i in mqo.Objects)
+            foreach (MqoObject obj in mqo.Objects)
             {
-                if(i.name.ToLower() == "bone")
+                if (obj.name.ToLower() == "bone")
                     continue;
 
-                Console.WriteLine("object:" + i.name);
+                Console.WriteLine("object:" + obj.name);
 
                 // 法線生成
-                Point3[]        nrm = new Point3[i.vertices.Count];
-                
-                foreach(MqoFace j in i.faces)
+                Point3[] nrm = new Point3[obj.vertices.Count];
+
+                foreach (MqoFace face in obj.faces)
                 {
-                    Point3  v1  = Point3.Normalize(i.vertices[j.b] - i.vertices[j.a]);
-                    Point3  v2  = Point3.Normalize(i.vertices[j.c] - i.vertices[j.b]);
-                    Point3  n   = Point3.Normalize(Point3.Cross(v1, v2));
-                    nrm[j.a]    -=n;
-                    nrm[j.b]    -=n;
-                    nrm[j.c]    -=n;
+                    Point3 v1 = Point3.Normalize(obj.vertices[face.b] - obj.vertices[face.a]);
+                    Point3 v2 = Point3.Normalize(obj.vertices[face.c] - obj.vertices[face.b]);
+                    Point3 n = Point3.Normalize(Point3.Cross(v1, v2));
+                    nrm[face.a] -= n;
+                    nrm[face.b] -= n;
+                    nrm[face.c] -= n;
                 }
 
-                for(int j= 0; j < nrm.Length; ++j)
-                    nrm[j]      = Point3.Normalize(nrm[j]);
+                for (int i = 0; i < nrm.Length; ++i)
+                    nrm[i] = Point3.Normalize(nrm[i]);
 
                 // ボーン情報作成
-                uint                idx     = 0x00000000;
-                Point4              wgt     = new Point4(1, 0, 0, 0);
-                int[]               bones   = new int[1];
-                string              bone;
+                uint idx = 0x00000000;
+                Point4 wgt = new Point4(1, 0, 0, 0);
+                int[] bones = new int[1];
+                string bone;
                 try
                 {
-                    bone = ObjectBoneNames[i.name];
+                    bone = ObjectBoneNames[obj.name];
                 }
                 catch (KeyNotFoundException)
                 {
-                    throw new KeyNotFoundException(string.Format("ボーン指定に誤りがあります。オブジェクト {0} にボーンを割り当てる必要があります。", i.name));
+                    throw new KeyNotFoundException(string.Format("ボーン指定に誤りがあります。オブジェクト {0} にボーンを割り当てる必要があります。", obj.name));
                 }
                 bones[0] = nodes[bone].ID;
 
                 // マテリアル別に処理を実行
-                List<ushort>        indices = new List<ushort>();
-                VertexHeap<Vertex>  vh      = new VertexHeap<Vertex>();
-                List<TSOSubMesh>    subs    = new List<TSOSubMesh>();
+                List<ushort> indices = new List<ushort>();
+                VertexHeap<Vertex> vh = new VertexHeap<Vertex>();
+                List<TSOSubMesh> subs = new List<TSOSubMesh>();
 
                 Console.WriteLine("  vertices bone_indices");
                 Console.WriteLine("  -------- ------------");
 
-                for(int j= 0, n= materials.Count; j < n; ++j)
+                for (int mtl = 0; mtl < materials.Count; ++mtl)
                 {
-                    int mtl = j;
                     indices.Clear();
 
-                    foreach(MqoFace f in i.faces)
+                    foreach (MqoFace face in obj.faces)
                     {
-                        if(f.mtl != mtl)
+                        if (face.mtl != mtl)
                             continue;
 
-                        Vertex  va  = new Vertex(i.vertices[f.a], wgt, idx, nrm[f.a], new Point2(f.ta.x, 1-f.ta.y));
-                        Vertex  vb  = new Vertex(i.vertices[f.b], wgt, idx, nrm[f.b], new Point2(f.tb.x, 1-f.tb.y));
-                        Vertex  vc  = new Vertex(i.vertices[f.c], wgt, idx, nrm[f.c], new Point2(f.tc.x, 1-f.tc.y));
+                        Vertex va = new Vertex(obj.vertices[face.a], wgt, idx, nrm[face.a], new Point2(face.ta.x, 1 - face.ta.y));
+                        Vertex vb = new Vertex(obj.vertices[face.b], wgt, idx, nrm[face.b], new Point2(face.tb.x, 1 - face.tb.y));
+                        Vertex vc = new Vertex(obj.vertices[face.c], wgt, idx, nrm[face.c], new Point2(face.tc.x, 1 - face.tc.y));
 
                         indices.Add(vh.Add(va));
                         indices.Add(vh.Add(vc));
                         indices.Add(vh.Add(vb));
                     }
 
-                    if(indices.Count == 0)
+                    if (indices.Count == 0)
                         continue;
 
                     // フェイス最適化
-                    ushort[]    nidx    = NvTriStrip.Optimize(indices.ToArray());
+                    ushort[] nidx = NvTriStrip.Optimize(indices.ToArray());
 
                     // サブメッシュ生成
-                    Vertex[]    verts= vh.verts.ToArray();
-                    TSOSubMesh  sub = new TSOSubMesh();
-                    sub.spec        = mtl;
-                    sub.numbones    = bones.Length;
-                    sub.bones       = bones;
+                    Vertex[] verts = vh.verts.ToArray();
+                    TSOSubMesh sub = new TSOSubMesh();
+                    sub.spec = mtl;
+                    sub.numbones = bones.Length;
+                    sub.bones = bones;
                     sub.numvertices = nidx.Length;
-                    sub.vertices    = new Vertex[nidx.Length];
-                   
-                    for(int k= 0; k < nidx.Length; ++k)
-                        sub.vertices[k] = verts[nidx[k]];
+                    sub.vertices = new Vertex[nidx.Length];
+
+                    for (int i = 0; i < nidx.Length; ++i)
+                        sub.vertices[i] = verts[nidx[i]];
 
                     Console.WriteLine("  {0,8} {1,12}", sub.vertices.Length, sub.bones.Length);
 
@@ -537,12 +536,12 @@ namespace Tso2MqoGui
                 }
 
                 // メッシュ生成
-                TSOMesh mesh    = new TSOMesh();
-                mesh.name       = i.name;
-                mesh.numsubs    = subs.Count;
-                mesh.sub        = subs.ToArray();
-                mesh.matrix     = Matrix44.Identity;
-                mesh.effect     = 0;
+                TSOMesh mesh = new TSOMesh();
+                mesh.name = obj.name;
+                mesh.numsubs = subs.Count;
+                mesh.sub_meshes = subs.ToArray();
+                mesh.matrix = Matrix44.Identity;
+                mesh.effect = 0;
                 meshes.Add(mesh);
             }
 
@@ -550,7 +549,7 @@ namespace Tso2MqoGui
         }
 
     }
-    
+
     public unsafe class TSOGeneratorRefBone : TSOGenerator
     {
         private List<Vertex> vlst;
@@ -566,7 +565,7 @@ namespace Tso2MqoGui
             vlst = new List<Vertex>();
 
             foreach (TSOMesh i in tso.meshes)
-                foreach (TSOSubMesh j in i.sub)
+                foreach (TSOSubMesh j in i.sub_meshes)
                     vlst.AddRange(j.vertices);
 
             pc = new PointCluster(vlst.Count);
@@ -582,21 +581,21 @@ namespace Tso2MqoGui
             // 参照TSOロード
             tsoref = LoadTSO(tsoref_file);
 
-            foreach (TSOMesh i in tsoref.meshes)
-                foreach (TSOSubMesh j in i.sub)
+            foreach (TSOMesh mesh in tsoref.meshes)
+                foreach (TSOSubMesh sub in mesh.sub_meshes)
                 {
-                    int[] bones = j.bones;
+                    int[] bones = sub.bones;
 
-                    for (int k = 0, n = j.numvertices; k < n; ++k)
+                    for (int k = 0, n = sub.numvertices; k < n; ++k)
                     {
                         // ボーンをグローバルな番号に変換
-                        uint idx0 = j.vertices[k].Idx;
+                        uint idx0 = sub.vertices[k].Idx;
                         byte* idx = (byte*)(&idx0);
                         idx[0] = (byte)bones[idx[0]];
                         idx[1] = (byte)bones[idx[1]];
                         idx[2] = (byte)bones[idx[2]];
                         idx[3] = (byte)bones[idx[3]];
-                        j.vertices[k].Idx = idx0;
+                        sub.vertices[k].Idx = idx0;
                     }
                 }
 
@@ -606,95 +605,95 @@ namespace Tso2MqoGui
 
         protected override bool DoGenerateMeshes()
         {
-            meshes  = new List<TSOMesh>();
+            meshes = new List<TSOMesh>();
 
-            foreach(MqoObject i in mqo.Objects)
+            foreach (MqoObject obj in mqo.Objects)
             {
-                if(i.name.ToLower() == "bone")
+                if (obj.name.ToLower() == "bone")
                     continue;
 
-                Console.WriteLine("object:" + i.name);
+                Console.WriteLine("object:" + obj.name);
 
                 // 一番近い頂点への参照
-                List<int>       vref= new List<int>(i.vertices.Count);
+                List<int> vref = new List<int>(obj.vertices.Count);
 
-                foreach(Point3 j in i.vertices)
+                foreach (Point3 j in obj.vertices)
                     vref.Add(pc.NearestIndex(j.x, j.y, j.z));
 
                 // 法線生成
-                Point3[]        nrm = new Point3[i.vertices.Count];
-                
-                foreach(MqoFace j in i.faces)
-                {
-                    Point3  v1  = Point3.Normalize(i.vertices[j.b] - i.vertices[j.a]);
-                    Point3  v2  = Point3.Normalize(i.vertices[j.c] - i.vertices[j.b]);
-                    Point3  n   = Point3.Normalize(Point3.Cross(v1, v2));
+                Point3[] nrm = new Point3[obj.vertices.Count];
 
-                    nrm[j.a]    -=n;
-                    nrm[j.b]    -=n;
-                    nrm[j.c]    -=n;
+                foreach (MqoFace j in obj.faces)
+                {
+                    Point3 v1 = Point3.Normalize(obj.vertices[j.b] - obj.vertices[j.a]);
+                    Point3 v2 = Point3.Normalize(obj.vertices[j.c] - obj.vertices[j.b]);
+                    Point3 n = Point3.Normalize(Point3.Cross(v1, v2));
+
+                    nrm[j.a] -= n;
+                    nrm[j.b] -= n;
+                    nrm[j.c] -= n;
                 }
 
-                for(int j= 0; j < nrm.Length; ++j)
-                    nrm[j]      = Point3.Normalize(nrm[j]);
+                for (int j = 0; j < nrm.Length; ++j)
+                    nrm[j] = Point3.Normalize(nrm[j]);
 
                 // フェイスの組成
-                List<int>               faces1  = new List<int>();
-                List<int>               faces2  = new List<int>();
-              //int[]                   bonecnv = new int[tsor.nodes.Length];   // ボーン変換テーブル
-                VertexHeap<Vertex>      vh      = new VertexHeap<Vertex>();
-                Vertex[]                v       = new Vertex[3];
-                List<int>               bones   = new List<int>(16);
-                List<ushort>            indices = new List<ushort>();
-                Dictionary<int, int>    selected= new Dictionary<int,int>();
-                Dictionary<int, int>    work    = new Dictionary<int,int>();
-                List<TSOSubMesh>        subs    = new List<TSOSubMesh>();
+                List<int> faces1 = new List<int>();
+                List<int> faces2 = new List<int>();
+                //int[]                   bonecnv = new int[tsor.nodes.Length];   // ボーン変換テーブル
+                VertexHeap<Vertex> vh = new VertexHeap<Vertex>();
+                Vertex[] v = new Vertex[3];
+                List<int> bones = new List<int>(16);
+                List<ushort> indices = new List<ushort>();
+                Dictionary<int, int> selected = new Dictionary<int, int>();
+                Dictionary<int, int> work = new Dictionary<int, int>();
+                List<TSOSubMesh> subs = new List<TSOSubMesh>();
 
-                for(int j= 0, n= i.faces.Count; j < n; ++j)
+                for (int j = 0, n = obj.faces.Count; j < n; ++j)
                     faces1.Add(j);
 
-#region ボーンパーティション
+                #region ボーンパーティション
                 Console.WriteLine("  vertices bone_indices");
                 Console.WriteLine("  -------- ------------");
 
                 while (faces1.Count > 0)
                 {
-                    int                 mtl     = i.faces[faces1[0]].mtl;
+                    int mtl = obj.faces[faces1[0]].mtl;
                     selected.Clear();
-                    indices .Clear();
-                    vh      .Clear();
-                    bones   .Clear();
+                    indices.Clear();
+                    vh.Clear();
+                    bones.Clear();
 
-                    foreach(int j in faces1)
+                    foreach (int j in faces1)
                     {
-                        MqoFace         f       = i.faces[j];
+                        MqoFace f = obj.faces[j];
 
-                        if(f.mtl != mtl)
+                        if (f.mtl != mtl)
                         {
                             faces2.Add(j);
                             continue;
                         }
 
-                        v[0]                    = vlst[vref[f.a]];
-                        v[1]                    = vlst[vref[f.b]];
-                        v[2]                    = vlst[vref[f.c]];
+                        v[0] = vlst[vref[f.a]];
+                        v[1] = vlst[vref[f.b]];
+                        v[2] = vlst[vref[f.c]];
 
                         work.Clear();
 
-                        for(int k= 0; k < 3; ++k)
+                        for (int k = 0; k < 3; ++k)
                         {
-                            Vertex      vv      = v[k];
-                            UInt32      idx0    = vv.Idx;
-                            Point4      wgt0    = vv.Wgt;
-                            byte*       idx     = (byte*)(&idx0);
-                            float*      wgt     = (float*)(&wgt0);
+                            Vertex vv = v[k];
+                            UInt32 idx0 = vv.Idx;
+                            Point4 wgt0 = vv.Wgt;
+                            byte* idx = (byte*)(&idx0);
+                            float* wgt = (float*)(&wgt0);
 
-                            for(int l= 0; l < 4; ++l)
+                            for (int l = 0; l < 4; ++l)
                             {
-                                if(wgt[l] <= float.Epsilon)         continue;
-                                if(selected.ContainsKey(idx[l]))    continue;
-                                
-                                if(!work.ContainsKey(idx[l]))
+                                if (wgt[l] <= float.Epsilon) continue;
+                                if (selected.ContainsKey(idx[l])) continue;
+
+                                if (!work.ContainsKey(idx[l]))
                                     work.Add(idx[l], 0);
                             }
                         }
@@ -706,16 +705,16 @@ namespace Tso2MqoGui
                         }
 
                         // ボーンリストに足してvalid
-                        foreach(KeyValuePair<int, int> l in work)
+                        foreach (KeyValuePair<int, int> l in work)
                         {
                             selected.Add(l.Key, selected.Count);    // ボーンテーブルに追加
                             bones.Add(l.Key);
                         }
 
                         // \todo 点の追加
-                        Vertex  va  = new Vertex(i.vertices[f.a], v[0].Wgt, v[0].Idx, nrm[f.a], new Point2(f.ta.x, 1-f.ta.y));
-                        Vertex  vb  = new Vertex(i.vertices[f.b], v[1].Wgt, v[1].Idx, nrm[f.b], new Point2(f.tb.x, 1-f.tb.y));
-                        Vertex  vc  = new Vertex(i.vertices[f.c], v[2].Wgt, v[2].Idx, nrm[f.c], new Point2(f.tc.x, 1-f.tc.y));
+                        Vertex va = new Vertex(obj.vertices[f.a], v[0].Wgt, v[0].Idx, nrm[f.a], new Point2(f.ta.x, 1 - f.ta.y));
+                        Vertex vb = new Vertex(obj.vertices[f.b], v[1].Wgt, v[1].Idx, nrm[f.b], new Point2(f.tb.x, 1 - f.tb.y));
+                        Vertex vc = new Vertex(obj.vertices[f.c], v[2].Wgt, v[2].Idx, nrm[f.c], new Point2(f.tc.x, 1 - f.tc.y));
 
                         indices.Add(vh.Add(va));
                         indices.Add(vh.Add(vc));
@@ -723,34 +722,34 @@ namespace Tso2MqoGui
                     }
 
                     // フェイス最適化
-                    ushort[]    nidx    = NvTriStrip.Optimize(indices.ToArray());
+                    ushort[] nidx = NvTriStrip.Optimize(indices.ToArray());
 
                     // 頂点のボーン参照ローカルに変換
-                    Vertex[]    verts   = vh.verts.ToArray();
+                    Vertex[] verts = vh.verts.ToArray();
 
-                    for(int j= 0; j < verts.Length; ++j)
+                    for (int j = 0; j < verts.Length; ++j)
                     {
-                        uint        idx0= verts[j].Idx;
-                        byte*       idx = (byte*)(&idx0);
-                        Point4      wgt0= verts[j].Wgt;
-                        float*      wgt = (float*)(&wgt0);
+                        uint idx0 = verts[j].Idx;
+                        byte* idx = (byte*)(&idx0);
+                        Point4 wgt0 = verts[j].Wgt;
+                        float* wgt = (float*)(&wgt0);
 
-                        for(int k= 0; k < 4; ++k)
-                            if(wgt[k] > float.Epsilon)
-                                idx[k]  = (byte)selected[idx[k]];
+                        for (int k = 0; k < 4; ++k)
+                            if (wgt[k] > float.Epsilon)
+                                idx[k] = (byte)selected[idx[k]];
 
-                        verts[j].Idx    = idx0;
+                        verts[j].Idx = idx0;
                     }
 
                     // サブメッシュ生成
-                    TSOSubMesh  sub = new TSOSubMesh();
-                    sub.spec        = mtl;
-                    sub.numbones    = bones.Count;
-                    sub.bones       = bones.ToArray();
+                    TSOSubMesh sub = new TSOSubMesh();
+                    sub.spec = mtl;
+                    sub.numbones = bones.Count;
+                    sub.bones = bones.ToArray();
                     sub.numvertices = nidx.Length;
-                    sub.vertices    = new Vertex[nidx.Length];
-                   
-                    for(int j= 0; j < nidx.Length; ++j)
+                    sub.vertices = new Vertex[nidx.Length];
+
+                    for (int j = 0; j < nidx.Length; ++j)
                         sub.vertices[j] = verts[nidx[j]];
 
                     Console.WriteLine("  {0,8} {1,12}", sub.vertices.Length, sub.bones.Length);
@@ -758,19 +757,19 @@ namespace Tso2MqoGui
                     subs.Add(sub);
 
                     // 次の周回
-                    List<int>   t   = faces1;
-                    faces1          = faces2;
-                    faces2          = t;
+                    List<int> t = faces1;
+                    faces1 = faces2;
+                    faces2 = t;
                     t.Clear();
                 }
-#endregion
+                #endregion
                 // \todo TSOMesh生成
-                TSOMesh mesh    = new TSOMesh();
-                mesh.name       = i.name;
-                mesh.numsubs    = subs.Count;
-                mesh.sub        = subs.ToArray();
-                mesh.matrix     = Matrix44.Identity;
-                mesh.effect     = 0;
+                TSOMesh mesh = new TSOMesh();
+                mesh.name = obj.name;
+                mesh.numsubs = subs.Count;
+                mesh.sub_meshes = subs.ToArray();
+                mesh.matrix = Matrix44.Identity;
+                mesh.effect = 0;
                 meshes.Add(mesh);
             }
 
@@ -792,42 +791,42 @@ namespace Tso2MqoGui
 
         public TextureInfo(string name, string file)
         {
-            this.name   = name;
-            this.file   = file;
+            this.name = name;
+            this.file = file;
         }
     }
 
     public class MaterialInfo
     {
-        public string           name;
-        public string           shader;
-        public string           diffuse;
-        public string           shadow;
-      //public Dictionary<string, string>   parameters;
+        public string name;
+        public string shader;
+        public string diffuse;
+        public string shadow;
+        //public Dictionary<string, string>   parameters;
 
-        public MaterialInfo(string path, MqoMaterial mqom, ImportMaterialInfo impm)
+        public MaterialInfo(string path, MqoMaterial mat, ImportMaterialInfo import_mat_info)
         {
-            name    = mqom.name;
-            diffuse = mqom.tex;
+            name = mat.name;
+            diffuse = mat.tex;
 
-            if(impm != null)
+            if (import_mat_info != null)
             {
-                string  file= Path.Combine(path, impm.Name);
+                string file = Path.Combine(path, import_mat_info.Name);
 
-                if(File.Exists(file))
-                    shader          = file;
+                if (File.Exists(file))
+                    shader = file;
 
-                if(impm.shadow != null)
+                if (import_mat_info.ShadeTex != null)
                 {
-                    file        = Path.Combine(path, impm.shadow.File);
+                    file = Path.Combine(path, import_mat_info.ShadeTex.File);
 
-                    if(File.Exists(file))
-                        shadow  = file;
+                    if (File.Exists(file))
+                        shadow = file;
                 }
             }
         }
 
-        public bool   Valid
+        public bool Valid
         {
             get
             {
@@ -839,30 +838,30 @@ namespace Tso2MqoGui
 
         public string[] GetCode()
         {
-            TSOMaterialCode code= TSOMaterialCode.GenerateFromFile(shader);
-            List<string>    line= new List<string>();
+            TSOMaterialCode code = TSOMaterialCode.GenerateFromFile(shader);
+            List<string> line = new List<string>();
 
             code.SetValue("ColorTex", Path.GetFileNameWithoutExtension(diffuse));
             code.SetValue("ShadeTex", Path.GetFileNameWithoutExtension(shadow));
 
-            foreach(KeyValuePair<string, TSOParameter> i in code)
+            foreach (KeyValuePair<string, TSOParameter> i in code)
                 line.Add(i.Value.ToString());
 
             return line.ToArray();
         }
 
-        public string Name           { get { return name;    } }
-        
+        public string Name { get { return name; } }
+
         [Editor(typeof(FileNameEditor), typeof(UITypeEditor))]
         [DisplayNameAttribute("シェーダー設定ファイル")]
-        public string ShaderFile     { get { return shader;  } set { shader  = value; } }
-        
+        public string ShaderFile { get { return shader; } set { shader = value; } }
+
         [Editor(typeof(FileNameEditor), typeof(UITypeEditor))]
         [DisplayNameAttribute("テクスチャ：カラー")]
         public string DiffuseTexture { get { return diffuse; } set { diffuse = value; } }
 
         [Editor(typeof(FileNameEditor), typeof(UITypeEditor))]
         [DisplayNameAttribute("テクスチャ：シェーティング")]
-        public string ShadowTexture  { get { return shadow;  } set { shadow  = value; } }
+        public string ShadowTexture { get { return shadow; } set { shadow = value; } }
     }
 }

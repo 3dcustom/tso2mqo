@@ -12,24 +12,28 @@ namespace Tso2MqoGui
     {
         public struct KeyAndValue
         {
-            [XmlAttribute("key")]   public string   Key;
-            [XmlAttribute("value")] public string   Value;
+            [XmlAttribute("key")]
+            public string Key;
+            [XmlAttribute("value")]
+            public string Value;
 
             public KeyAndValue(string k, string v)
             {
-                Key     = k;
-                Value   = v;
+                Key = k;
+                Value = v;
             }
         }
 
-        public static Config    Instance;
+        public static Config Instance;
 
-        public static string    AssemblyPath    { get { return Path.GetDirectoryName(Type.Assembly.Location); } }
-        public static string    ConfigFile      { get { return Path.Combine(AssemblyPath, "config.xml"); } }
-        public static Type      Type            { get { return typeof(Config); } }
+        public static string AssemblyPath { get { return Path.GetDirectoryName(Type.Assembly.Location); } }
+        public static string ConfigFile { get { return Path.Combine(AssemblyPath, "config.xml"); } }
+        public static Type Type { get { return typeof(Config); } }
 
-        [XmlElement("object_bone_list")] public List<KeyAndValue>   object_bone_list    = new List<KeyAndValue>();
-        [XmlIgnore] public Dictionary<string, string>               object_bone_map     = new Dictionary<string,string>();
+        [XmlElement("object_bone_list")]
+        public List<KeyAndValue> object_bone_list = new List<KeyAndValue>();
+        [XmlIgnore]
+        public Dictionary<string, string> object_bone_map = new Dictionary<string, string>();
 
         static Config()
         {
@@ -40,16 +44,17 @@ namespace Tso2MqoGui
         {
             try
             {
-                using(FileStream fs= File.OpenRead(ConfigFile))
+                using (FileStream fs = File.OpenRead(ConfigFile))
                 {
-                    XmlSerializer   s   = new XmlSerializer(Type);
-                    Instance            = s.Deserialize(fs) as Config;
+                    XmlSerializer s = new XmlSerializer(Type);
+                    Instance = s.Deserialize(fs) as Config;
                     Instance.AfterDeserialize();
                 }
-            } catch(Exception e)
+            }
+            catch (Exception exception)
             {
-                System.Diagnostics.Debug.WriteLine(e.ToString());
-                Instance                = new Config();
+                System.Diagnostics.Debug.WriteLine(exception.ToString());
+                Instance = new Config();
             }
         }
 
@@ -57,17 +62,18 @@ namespace Tso2MqoGui
         {
             try
             {
-                using(FileStream fs= File.OpenWrite(ConfigFile))
+                using (FileStream fs = File.OpenWrite(ConfigFile))
                 {
                     fs.SetLength(0);
-                    XmlSerializer   s   = new XmlSerializer(Type);
+                    XmlSerializer s = new XmlSerializer(Type);
                     Instance.BeforeSerialize();
                     s.Serialize(fs, Instance);
                     fs.Flush();
                 }
-            } catch(Exception e)
+            }
+            catch (Exception exception)
             {
-                System.Diagnostics.Debug.WriteLine(e.ToString());
+                System.Diagnostics.Debug.WriteLine(exception.ToString());
             }
         }
 
@@ -75,7 +81,7 @@ namespace Tso2MqoGui
         {
             object_bone_list.Clear();
 
-            foreach(string i in object_bone_map.Keys)
+            foreach (string i in object_bone_map.Keys)
                 object_bone_list.Add(new KeyAndValue(i, object_bone_map[i]));
         }
 
@@ -83,7 +89,7 @@ namespace Tso2MqoGui
         {
             object_bone_map.Clear();
 
-            foreach(KeyAndValue i in object_bone_list)
+            foreach (KeyAndValue i in object_bone_list)
                 object_bone_map.Add(i.Key, i.Value);
         }
     }

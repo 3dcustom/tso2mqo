@@ -14,7 +14,7 @@ namespace Tso2MqoGui
 
         public static void Write(BinaryWriter bw, string s)
         {
-            foreach(byte i in Encoding.Default.GetBytes(s))
+            foreach (byte i in Encoding.Default.GetBytes(s))
                 bw.Write(i);
 
             bw.Write((byte)0);
@@ -22,11 +22,11 @@ namespace Tso2MqoGui
 
         public static void Write(BinaryWriter bw, string[] s)
         {
-            int n   = s[s.Length-1] == "" ? s.Length-1 : s.Length;
+            int n = s[s.Length - 1] == "" ? s.Length - 1 : s.Length;
 
             bw.Write(n);
 
-            for(int i= 0; i < n; ++i)
+            for (int i = 0; i < n; ++i)
                 Write(bw, s[i]);
         }
 
@@ -34,12 +34,12 @@ namespace Tso2MqoGui
         {
             bw.Write(items.Length);
 
-            foreach(var i in items)
+            foreach (var i in items)
                 Write(bw, i);
 
             bw.Write(items.Length);
 
-            foreach(var i in items)
+            foreach (var i in items)
                 Write(bw, i.Matrix);
         }
 
@@ -60,7 +60,7 @@ namespace Tso2MqoGui
         {
             bw.Write(items.Length);
 
-            foreach(var i in items)
+            foreach (var i in items)
                 Write(bw, i);
         }
 
@@ -78,7 +78,7 @@ namespace Tso2MqoGui
         {
             bw.Write(items.Length);
 
-            foreach(var i in items)
+            foreach (var i in items)
                 Write(bw, i);
         }
 
@@ -92,7 +92,7 @@ namespace Tso2MqoGui
         {
             bw.Write(items.Length);
 
-            foreach(var i in items)
+            foreach (var i in items)
                 Write(bw, i);
         }
 
@@ -107,7 +107,7 @@ namespace Tso2MqoGui
         {
             bw.Write(items.Length);
 
-            foreach(var i in items)
+            foreach (var i in items)
                 Write(bw, i);
         }
 
@@ -116,14 +116,14 @@ namespace Tso2MqoGui
             Write(bw, item.Name);
             Write(bw, item.Matrix);
             bw.Write(1);
-            Write(bw, item.sub);
+            Write(bw, item.sub_meshes);
         }
 
         public static void Write(BinaryWriter bw, TSOSubMesh[] items)
         {
             bw.Write(items.Length);
 
-            foreach(var i in items)
+            foreach (var i in items)
                 Write(bw, i);
         }
 
@@ -132,26 +132,26 @@ namespace Tso2MqoGui
             bw.Write(item.spec);
             bw.Write(item.numbones);
 
-            foreach(int k in item.bones)
+            foreach (int k in item.bones)
                 bw.Write(k);
 
             bw.Write(item.numvertices);
 
-            foreach(Vertex k in item.vertices)
+            foreach (Vertex k in item.vertices)
                 Write(bw, k);
         }
 
         public unsafe static void Write(BinaryWriter bw, Vertex v)
         {
-            uint        idx0    = v.Idx;
-            byte*       idx     = (byte*)(&idx0);
-            List<int>   idxs    = new List<int>(4);
-            List<float> wgts    = new List<float>(4);
+            uint idx0 = v.Idx;
+            byte* idx = (byte*)(&idx0);
+            List<int> idxs = new List<int>(4);
+            List<float> wgts = new List<float>(4);
 
-            if(v.Wgt.x > 0) { idxs.Add(idx[0]); wgts.Add(v.Wgt.x); }
-            if(v.Wgt.y > 0) { idxs.Add(idx[1]); wgts.Add(v.Wgt.y); }
-            if(v.Wgt.z > 0) { idxs.Add(idx[2]); wgts.Add(v.Wgt.z); }
-            if(v.Wgt.w > 0) { idxs.Add(idx[3]); wgts.Add(v.Wgt.w); }
+            if (v.Wgt.x > 0) { idxs.Add(idx[0]); wgts.Add(v.Wgt.x); }
+            if (v.Wgt.y > 0) { idxs.Add(idx[1]); wgts.Add(v.Wgt.y); }
+            if (v.Wgt.z > 0) { idxs.Add(idx[2]); wgts.Add(v.Wgt.z); }
+            if (v.Wgt.w > 0) { idxs.Add(idx[3]); wgts.Add(v.Wgt.w); }
 
             bw.Write(v.Pos.X); bw.Write(v.Pos.Y); bw.Write(v.Pos.Z);
             bw.Write(v.Nrm.X); bw.Write(v.Nrm.Y); bw.Write(v.Nrm.Z);
@@ -159,7 +159,7 @@ namespace Tso2MqoGui
 
             bw.Write(wgts.Count);
 
-            for(int i= 0, n= idxs.Count; i < n; ++i)
+            for (int i = 0, n = idxs.Count; i < n; ++i)
             {
                 bw.Write(idxs[i]);
                 bw.Write(wgts[i]);
