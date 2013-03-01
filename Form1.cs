@@ -12,12 +12,6 @@ namespace Tso2MqoGui
 {
     public partial class Form1 : Form
     {
-        public string OutPath
-        {
-            get { return tbPath.Text; }
-            set { tbPath.Text = value; }
-        }
-
         public Form1()
         {
             InitializeComponent();
@@ -26,7 +20,7 @@ namespace Tso2MqoGui
         private void Form1_Load(object sender, EventArgs e)
         {
             RegistryKey reg = Application.UserAppDataRegistry.CreateSubKey("Config");
-            OutPath = (string)reg.GetValue("OutPath", Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments));
+            tbPath.Text = (string)reg.GetValue("OutPath", Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments));
             tabControl1.SelectedIndex = (int)reg.GetValue("TabPage", 0);
             tbMqoFile.Text = (string)reg.GetValue("MqoIn", "");
             tbTsoFileRef.Text = (string)reg.GetValue("Tso", "");
@@ -55,7 +49,7 @@ namespace Tso2MqoGui
         private void Form1_FormClosed(object sender, FormClosedEventArgs e)
         {
             RegistryKey reg = Application.UserAppDataRegistry.CreateSubKey("Config");
-            reg.SetValue("OutPath", OutPath);
+            reg.SetValue("OutPath", tbPath.Text);
             reg.SetValue("TabPage", tabControl1.SelectedIndex);
             reg.SetValue("MqoIn", tbMqoFile.Text);
             reg.SetValue("Tso", tbTsoFileRef.Text);
@@ -107,7 +101,7 @@ namespace Tso2MqoGui
                         foreach (string i in files)
                         {
                             if (Path.GetExtension(i).ToUpper() == ".TSO")
-                                OpenTSOFile(i);
+                                GenerateMqo(i);
                         }
 
                         break;
@@ -161,20 +155,15 @@ namespace Tso2MqoGui
             e.Effect = DragDropEffects.Copy;
         }
 
-        private void OpenTSOFile(string file)
+        private void GenerateMqo(string tso_file)
         {
-            string dir = OutPath;
+            string out_path = tbPath.Text;
 
             if (cbMakeSub.Checked)
             {
-                dir = Path.Combine(dir, Path.GetFileNameWithoutExtension(file));
-
-                if (!Directory.Exists(dir))
-                    Directory.CreateDirectory(dir);
+                out_path = Path.Combine(out_path, Path.GetFileNameWithoutExtension(tso_file));
+                Directory.CreateDirectory(out_path);
             }
-
-            string mqo_path = Path.Combine(dir, Path.ChangeExtension(Path.GetFileName(file), ".mqo"));
-            string importinfo_path = Path.Combine(dir, Path.ChangeExtension(Path.GetFileName(file), ".xml"));
 
             try
             {
@@ -184,46 +173,15 @@ namespace Tso2MqoGui
                 label2.Invalidate();
                 label2.Update();
 
-                // モデル、テクスチャの作成
-                using (MqoWriter mqo = new MqoWriter(mqo_path))
-                {
-                    TSOFile tso = new TSOFile(file);
-                    tso.ReadAll();
-
-                    if (rbBoneRokDeBone.Checked) mqo.BoneMode = MqoBoneMode.RokDeBone;
-
-                    mqo.Write(tso);
-                    mqo.Close();
-
-                    ImportInfo ii = new ImportInfo();
-
-                    // テクスチャ情報
-                    foreach (TSOTex tex in tso.textures)
-                        ii.textures.Add(new ImportTextureInfo(tex));
-
-                    // エフェクトの作成
-                    foreach (TSOEffect effect in tso.effects)
-                    {
-                        ii.effects.Add(new ImportEffectInfo(effect));
-                        File.WriteAllText(Path.Combine(dir, effect.Name), effect.code, Encoding.Default);
-                    }
-
-                    // マテリアルの作成
-                    foreach (TSOMaterial mat in tso.materials)
-                    {
-                        ii.materials.Add(new ImportMaterialInfo(mat));
-                        File.WriteAllText(Path.Combine(dir, mat.Name), mat.code, Encoding.Default);
-                    }
-
-                    ImportInfo.Save(importinfo_path, ii);
-                }
+                MqoGenerator gen = new MqoGenerator();
+                gen.Generate(tso_file, out_path, rbBoneRokDeBone.Checked ? MqoBoneMode.RokDeBone : MqoBoneMode.None);
 
                 if (cbCopyTSO.Checked)
                 {
-                    string tso_path = Path.Combine(dir, Path.GetFileName(file));
+                    string tso_path = Path.Combine(out_path, Path.GetFileName(tso_file));
 
-                    if (file != tso_path)
-                        File.Copy(file, tso_path, true);
+                    if (tso_file != tso_path)
+                        File.Copy(tso_file, tso_path, true);
                 }
             }
             finally
@@ -235,7 +193,7 @@ namespace Tso2MqoGui
             }
         }
 
-        private void OpenMQOFile(string file)
+        private void GenerateTso(string file)
         {
             TSOGeneratorConfig config = new TSOGeneratorConfig();
             config.ShowMaterials = cbShowMaterials.Checked;
@@ -271,10 +229,10 @@ namespace Tso2MqoGui
         private void button1_Click(object sender, EventArgs e)
         {
             FolderBrowserDialog dlg = new FolderBrowserDialog();
-            dlg.SelectedPath = OutPath;
+            dlg.SelectedPath = tbPath.Text;
 
             if (dlg.ShowDialog() == DialogResult.OK)
-                OutPath = dlg.SelectedPath;
+                tbPath.Text = dlg.SelectedPath;
         }
         #endregion
         #region mqo->tso UI
@@ -455,7 +413,7 @@ namespace Tso2MqoGui
                 tabPage2.BackColor = Color.Tomato;
                 tabPage2.Update();
                 string file = tbMqoFile.Text;
-                OpenMQOFile(file);
+                GenerateTso(file);
             }
             catch (Exception exception)
             {

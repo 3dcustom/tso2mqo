@@ -19,42 +19,49 @@ namespace Tso2MqoGui
                 // バッチで処理する
                 try
                 {
-                    string tso = null;
-                    string mqo = null;
-                    string tsoref = null;
+                    string tso_file = null;
+                    string mqo_file = null;
+                    string tsoref_file = null;
+                    string out_path = null;
 
-                    foreach (string i in args)
+                    foreach (string arg in args)
                     {
-                        string o = i.ToLower();
+                        string opt = arg.ToLower();
 
-                        switch (o)
-                        {
-                            default:
-                                if (o.StartsWith("-tso:"))
-                                    tso = o.Substring(5).Trim('\r', '\n');
-                                else if (o.StartsWith("-mqo:"))
-                                    mqo = o.Substring(5).Trim('\r', '\n');
-                                else if (o.StartsWith("-ref:"))
-                                    tsoref = o.Substring(5).Trim('\r', '\n');
-                                else
-                                    throw new ArgumentException("Invalid option: " + i);
-                                break;
-                        }
+                        if (opt.StartsWith("-tso:"))
+                            tso_file = opt.Substring(5).Trim('\r', '\n');
+                        else if (opt.StartsWith("-mqo:"))
+                            mqo_file = opt.Substring(5).Trim('\r', '\n');
+                        else if (opt.StartsWith("-ref:"))
+                            tsoref_file = opt.Substring(5).Trim('\r', '\n');
+                        else if (opt.StartsWith("-out:"))
+                            out_path = opt.Substring(5).Trim('\r', '\n');
+                        else
+                            throw new ArgumentException("Invalid option: " + arg);
                     }
 
-                    TSOGeneratorConfig config = new TSOGeneratorConfig();
-                    config.cui = true;
-                    config.ShowMaterials = false;
-                    TSOGeneratorRefBone gen = new TSOGeneratorRefBone(config);
+                    if (tso_file == null)
+                        throw new ArgumentException("-tso:ファイル名 の形式で出力Tsoファイル名を指定してください");
 
-                    if (mqo == null)
-                        throw new ArgumentException("「-mso:ファイル名」の形式で入力Mqoファイル名を指定してください");
-                    if (tso == null)
-                        throw new ArgumentException("「-tso:ファイル名」の形式で出力Tsoファイル名を指定してください");
-                    if (tsoref == null)
-                        throw new ArgumentException("「-ref:ファイル名」の形式で参照Tsoファイル名を指定してください");
+                    if (out_path != null)
+                    {
+                        MqoGenerator gen = new MqoGenerator();
+                        gen.Generate(tso_file, out_path, MqoBoneMode.None);
+                    }
+                    else
+                    {
+                        if (mqo_file == null)
+                            throw new ArgumentException("-mso:ファイル名 の形式で入力Mqoファイル名を指定してください");
+                        if (tsoref_file == null)
+                            throw new ArgumentException("-ref:ファイル名 の形式で参照Tsoファイル名を指定してください");
 
-                    gen.Generate(mqo, tsoref, tso);
+                        TSOGeneratorConfig config = new TSOGeneratorConfig();
+                        config.cui = true;
+                        config.ShowMaterials = false;
+                        TSOGeneratorRefBone gen = new TSOGeneratorRefBone(config);
+
+                        gen.Generate(mqo_file, tsoref_file, tso_file);
+                    }
                 }
                 catch (ArgumentException e)
                 {
