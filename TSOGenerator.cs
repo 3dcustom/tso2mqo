@@ -47,7 +47,6 @@ namespace Tso2MqoGui
             // MQO読み込み
             mqo = new MqoFile();
             mqo.Load(mqo_file);
-            mqo.Dump();
             return true;
         }
 

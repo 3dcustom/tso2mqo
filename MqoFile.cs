@@ -10,8 +10,7 @@ namespace Tso2MqoGui
     {
         private delegate bool SectionHandler(string[] tokens);
 
-        public static char[] delimiters = new char[] { ' ', '\t' };
-        public static char[] delimiters2 = new char[] { ' ', '\t', '(', ')' };
+        private static char[] delimiters2 = new char[] { ' ', '\t', '(', ')' };
 
         private string file;
         private StreamReader sr;
@@ -32,18 +31,6 @@ namespace Tso2MqoGui
                 sr = new StreamReader(fs, Encoding.Default);
                 ReadAll();
             }
-        }
-
-        public void Dump()
-        {
-            System.Diagnostics.Debug.WriteLine(file);
-            System.Diagnostics.Debug.WriteLine(scene);
-
-            foreach (MqoMaterial i in materials)
-                System.Diagnostics.Debug.WriteLine(i);
-
-            foreach (MqoObject i in objects)
-                System.Diagnostics.Debug.WriteLine(i);
         }
 
         public void ReadAll()
@@ -151,7 +138,6 @@ namespace Tso2MqoGui
                 case "material": ParseMaterial(tokens); return true;
                 case "object": ParseObject(tokens); return true;
                 case "eof": return false;
-                //default:            Error(tokens);              return false;
                 default: return true;
             }
         }
@@ -170,7 +156,6 @@ namespace Tso2MqoGui
                 case "zoom2": scene.zoom2 = float.Parse(tokens[1]); return true;
                 case "amb": scene.amb = Color3.Parse(tokens, 1); return true;
                 case "}": return false;
-                //default:            Error(tokens);                                  return false;
                 default: return true;
             }
         }
@@ -226,7 +211,6 @@ namespace Tso2MqoGui
                 case "vertex": ParseVertex(tokens); return true;
                 case "face": ParseFace(tokens); return true;
                 case "}": return false;
-                //default:            Error(tokens);                                  return false;
                 default: return true;
             }
         }
@@ -400,19 +384,6 @@ namespace Tso2MqoGui
         public float ortho;
         public float zoom2;
         public Color3 amb;
-
-        public override string ToString()
-        {
-            return (new StringBuilder(256))
-                .Append(" pos: ").Append(pos)
-                .Append(" lookat: ").Append(lookat)
-                .Append(" head: ").Append(head)
-                .Append(" pich: ").Append(pich)
-                .Append(" ortho: ").Append(ortho)
-                .Append(" zoom2: ").Append(zoom2)
-                .Append(" amb: ").Append(amb)
-                .ToString();
-        }
     }
 
     public class MqoMaterial
@@ -429,21 +400,6 @@ namespace Tso2MqoGui
 
         public MqoMaterial() { }
         public MqoMaterial(string n) { name = n; }
-
-        public override string ToString()
-        {
-            return (new StringBuilder(256))
-                .Append(" shader: ").Append(shader)
-                .Append(" col: ").Append(col)
-                .Append(" dif: ").Append(dif)
-                .Append(" amb: ").Append(amb)
-                .Append(" emi: ").Append(emi)
-                .Append(" spc: ").Append(spc)
-                .Append(" power: ").Append(power)
-                .Append(" tex: ").Append(tex)
-                .Append(" name: ").Append(name)
-                .ToString();
-        }
     }
 
     public class MqoObject
@@ -460,21 +416,6 @@ namespace Tso2MqoGui
 
         public MqoObject() { }
         public MqoObject(string n) { name = n; }
-
-        public override string ToString()
-        {
-            return (new StringBuilder(256))
-                .Append(" visible: ").Append(visible)
-                .Append(" locking: ").Append(locking)
-                .Append(" shading: ").Append(shading)
-                .Append(" facet: ").Append(facet)
-                .Append(" color: ").Append(color)
-                .Append(" color_type: ").Append(color_type)
-                .Append(" vertices: ").Append(vertices.Count)
-                .Append(" faces: ").Append(faces.Count)
-                .Append(" name: ").Append(name)
-                .ToString();
-        }
     }
 
     public class MqoFace
@@ -495,15 +436,6 @@ namespace Tso2MqoGui
             this.ta = ta;
             this.tb = tb;
             this.tc = tc;
-        }
-
-        public override string ToString()
-        {
-            return (new StringBuilder(256))
-                .Append("v: ").Append(a).Append(" ").Append(b).Append(" ").Append(c)
-                .Append(" mtl: ").Append(mtl)
-                .Append(" uv: ").Append(ta).Append(" ").Append(tb).Append(" ").Append(tc)
-                .ToString();
         }
     }
 }
