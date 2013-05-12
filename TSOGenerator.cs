@@ -83,15 +83,15 @@ namespace Tso2MqoGui
 
             foreach (MaterialInfo i in materials.Values)
             {
-                string name = Path.GetFileNameWithoutExtension(i.diffuse);
+                string name = Path.GetFileNameWithoutExtension(i.DiffuseTexture);
 
                 if (!textures.ContainsKey(name))
-                    textures.Add(name, new TextureInfo(name, i.diffuse));
+                    textures.Add(name, new TextureInfo(name, i.DiffuseTexture));
 
-                name = Path.GetFileNameWithoutExtension(i.shadow);
+                name = Path.GetFileNameWithoutExtension(i.ShadowTexture);
 
                 if (!textures.ContainsKey(name))
-                    textures.Add(name, new TextureInfo(name, i.shadow));
+                    textures.Add(name, new TextureInfo(name, i.ShadowTexture));
             }
 
             return true;
@@ -797,10 +797,10 @@ namespace Tso2MqoGui
 
     public class MaterialInfo
     {
-        public string name;
-        public string shader;
-        public string diffuse;
-        public string shadow;
+        string name;
+        string shader;
+        string diffuse;
+        string shadow;
         //public Dictionary<string, string>   parameters;
 
         public MaterialInfo(string path, MqoMaterial mat, ImportMaterialInfo import_mat_info)

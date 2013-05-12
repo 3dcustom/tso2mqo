@@ -25,9 +25,9 @@ namespace Tso2MqoGui
             {
                 ListViewItem item = lvMaterials.Items.Add(mat_info.Name);
                 item.Tag = mat_info;
-                item.SubItems.Add(mat_info.diffuse == null ? "" : mat_info.diffuse);
-                item.SubItems.Add(mat_info.shadow == null ? "" : mat_info.shadow);
-                item.SubItems.Add(mat_info.shader == null ? "" : mat_info.shader);
+                item.SubItems.Add(mat_info.DiffuseTexture ?? "");
+                item.SubItems.Add(mat_info.ShadowTexture ?? "");
+                item.SubItems.Add(mat_info.ShaderFile ?? "");
             }
         }
 
