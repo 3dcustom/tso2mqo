@@ -83,15 +83,15 @@ namespace Tso2MqoGui
 
             foreach (MaterialInfo i in materials.Values)
             {
-                string name = Path.GetFileNameWithoutExtension(i.DiffuseTexture);
+                string name = Path.GetFileNameWithoutExtension(i.ColorTexture);
 
                 if (!textures.ContainsKey(name))
-                    textures.Add(name, new TextureInfo(name, i.DiffuseTexture));
+                    textures.Add(name, new TextureInfo(name, i.ColorTexture));
 
-                name = Path.GetFileNameWithoutExtension(i.ShadowTexture);
+                name = Path.GetFileNameWithoutExtension(i.ShadeTexture);
 
                 if (!textures.ContainsKey(name))
-                    textures.Add(name, new TextureInfo(name, i.ShadowTexture));
+                    textures.Add(name, new TextureInfo(name, i.ShadeTexture));
             }
 
             return true;
@@ -799,14 +799,14 @@ namespace Tso2MqoGui
     {
         string name;
         string shader;
-        string diffuse;
-        string shadow;
+        string color_tex;
+        string shade_tex;
         //public Dictionary<string, string>   parameters;
 
         public MaterialInfo(string path, MqoMaterial mat, ImportMaterialInfo import_mat_info)
         {
             name = mat.name;
-            diffuse = mat.tex;
+            color_tex = mat.tex;
 
             if (import_mat_info != null)
             {
@@ -820,7 +820,7 @@ namespace Tso2MqoGui
                     file = Path.Combine(path, import_mat_info.ShadeTex.File);
 
                     if (File.Exists(file))
-                        shadow = file;
+                        shade_tex = file;
                 }
             }
         }
@@ -830,8 +830,8 @@ namespace Tso2MqoGui
             get
             {
                 return File.Exists(shader)
-                    && File.Exists(diffuse)
-                    && File.Exists(shadow);
+                    && File.Exists(color_tex)
+                    && File.Exists(shade_tex);
             }
         }
 
@@ -840,8 +840,8 @@ namespace Tso2MqoGui
             TSOMaterialCode code = TSOMaterialCode.GenerateFromFile(shader);
             List<string> line = new List<string>();
 
-            code.SetValue("ColorTex", Path.GetFileNameWithoutExtension(diffuse));
-            code.SetValue("ShadeTex", Path.GetFileNameWithoutExtension(shadow));
+            code.SetValue("ColorTex", Path.GetFileNameWithoutExtension(color_tex));
+            code.SetValue("ShadeTex", Path.GetFileNameWithoutExtension(shade_tex));
 
             foreach (KeyValuePair<string, TSOParameter> i in code)
                 line.Add(i.Value.ToString());
@@ -857,10 +857,10 @@ namespace Tso2MqoGui
 
         [Editor(typeof(FileNameEditor), typeof(UITypeEditor))]
         [DisplayNameAttribute("テクスチャ：カラー")]
-        public string DiffuseTexture { get { return diffuse; } set { diffuse = value; } }
+        public string ColorTexture { get { return color_tex; } set { color_tex = value; } }
 
         [Editor(typeof(FileNameEditor), typeof(UITypeEditor))]
         [DisplayNameAttribute("テクスチャ：シェーティング")]
-        public string ShadowTexture { get { return shadow; } set { shadow = value; } }
+        public string ShadeTexture { get { return shade_tex; } set { shade_tex = value; } }
     }
 }

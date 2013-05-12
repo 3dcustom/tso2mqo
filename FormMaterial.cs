@@ -25,8 +25,8 @@ namespace Tso2MqoGui
             {
                 ListViewItem item = lvMaterials.Items.Add(mat_info.Name);
                 item.Tag = mat_info;
-                item.SubItems.Add(mat_info.DiffuseTexture ?? "");
-                item.SubItems.Add(mat_info.ShadowTexture ?? "");
+                item.SubItems.Add(mat_info.ColorTexture ?? "");
+                item.SubItems.Add(mat_info.ShadeTexture ?? "");
                 item.SubItems.Add(mat_info.ShaderFile ?? "");
             }
         }
@@ -90,10 +90,10 @@ namespace Tso2MqoGui
 
                 switch (e.ChangedItem.PropertyDescriptor.Name)
                 {
-                    case "DiffuseTexture":
+                    case "ColorTexture":
                         item.SubItems[1].Text = e.ChangedItem.Value.ToString();
                         break;
-                    case "ShadowTexture":
+                    case "ShadeTexture":
                         item.SubItems[2].Text = e.ChangedItem.Value.ToString();
                         break;
                     case "ShaderFile":
