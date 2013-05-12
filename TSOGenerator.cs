@@ -455,20 +455,20 @@ namespace Tso2MqoGui
                 Console.WriteLine("object:" + obj.name);
 
                 // 法線生成
-                Point3[] nrm = new Point3[obj.vertices.Count];
+                Point3[] normal = new Point3[obj.vertices.Count];
 
                 foreach (MqoFace face in obj.faces)
                 {
                     Point3 v1 = Point3.Normalize(obj.vertices[face.b] - obj.vertices[face.a]);
                     Point3 v2 = Point3.Normalize(obj.vertices[face.c] - obj.vertices[face.b]);
                     Point3 n = Point3.Normalize(Point3.Cross(v1, v2));
-                    nrm[face.a] -= n;
-                    nrm[face.b] -= n;
-                    nrm[face.c] -= n;
+                    normal[face.a] -= n;
+                    normal[face.b] -= n;
+                    normal[face.c] -= n;
                 }
 
-                for (int i = 0; i < nrm.Length; ++i)
-                    nrm[i] = Point3.Normalize(nrm[i]);
+                for (int i = 0; i < normal.Length; ++i)
+                    normal[i] = Point3.Normalize(normal[i]);
 
                 // ボーン情報作成
                 uint idx = 0x00000000;
@@ -502,9 +502,9 @@ namespace Tso2MqoGui
                         if (face.mtl != mtl)
                             continue;
 
-                        Vertex va = new Vertex(obj.vertices[face.a], wgt, idx, nrm[face.a], new Point2(face.ta.x, 1 - face.ta.y));
-                        Vertex vb = new Vertex(obj.vertices[face.b], wgt, idx, nrm[face.b], new Point2(face.tb.x, 1 - face.tb.y));
-                        Vertex vc = new Vertex(obj.vertices[face.c], wgt, idx, nrm[face.c], new Point2(face.tc.x, 1 - face.tc.y));
+                        Vertex va = new Vertex(obj.vertices[face.a], wgt, idx, normal[face.a], new Point2(face.ta.x, 1 - face.ta.y));
+                        Vertex vb = new Vertex(obj.vertices[face.b], wgt, idx, normal[face.b], new Point2(face.tb.x, 1 - face.tb.y));
+                        Vertex vc = new Vertex(obj.vertices[face.c], wgt, idx, normal[face.c], new Point2(face.tc.x, 1 - face.tc.y));
 
                         indices.Add(vh.Add(va));
                         indices.Add(vh.Add(vc));
@@ -620,21 +620,21 @@ namespace Tso2MqoGui
                     vref.Add(pc.NearestIndex(j.x, j.y, j.z));
 
                 // 法線生成
-                Point3[] nrm = new Point3[obj.vertices.Count];
+                Point3[] normal = new Point3[obj.vertices.Count];
 
-                foreach (MqoFace j in obj.faces)
+                foreach (MqoFace face in obj.faces)
                 {
-                    Point3 v1 = Point3.Normalize(obj.vertices[j.b] - obj.vertices[j.a]);
-                    Point3 v2 = Point3.Normalize(obj.vertices[j.c] - obj.vertices[j.b]);
+                    Point3 v1 = Point3.Normalize(obj.vertices[face.b] - obj.vertices[face.a]);
+                    Point3 v2 = Point3.Normalize(obj.vertices[face.c] - obj.vertices[face.b]);
                     Point3 n = Point3.Normalize(Point3.Cross(v1, v2));
 
-                    nrm[j.a] -= n;
-                    nrm[j.b] -= n;
-                    nrm[j.c] -= n;
+                    normal[face.a] -= n;
+                    normal[face.b] -= n;
+                    normal[face.c] -= n;
                 }
 
-                for (int j = 0; j < nrm.Length; ++j)
-                    nrm[j] = Point3.Normalize(nrm[j]);
+                for (int j = 0; j < normal.Length; ++j)
+                    normal[j] = Point3.Normalize(normal[j]);
 
                 // フェイスの組成
                 List<int> faces1 = new List<int>();
@@ -711,9 +711,9 @@ namespace Tso2MqoGui
                         }
 
                         // \todo 点の追加
-                        Vertex va = new Vertex(obj.vertices[f.a], v[0].Wgt, v[0].Idx, nrm[f.a], new Point2(f.ta.x, 1 - f.ta.y));
-                        Vertex vb = new Vertex(obj.vertices[f.b], v[1].Wgt, v[1].Idx, nrm[f.b], new Point2(f.tb.x, 1 - f.tb.y));
-                        Vertex vc = new Vertex(obj.vertices[f.c], v[2].Wgt, v[2].Idx, nrm[f.c], new Point2(f.tc.x, 1 - f.tc.y));
+                        Vertex va = new Vertex(obj.vertices[f.a], v[0].Wgt, v[0].Idx, normal[f.a], new Point2(f.ta.x, 1 - f.ta.y));
+                        Vertex vb = new Vertex(obj.vertices[f.b], v[1].Wgt, v[1].Idx, normal[f.b], new Point2(f.tb.x, 1 - f.tb.y));
+                        Vertex vc = new Vertex(obj.vertices[f.c], v[2].Wgt, v[2].Idx, normal[f.c], new Point2(f.tc.x, 1 - f.tc.y));
 
                         indices.Add(vh.Add(va));
                         indices.Add(vh.Add(vc));
