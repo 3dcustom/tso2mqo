@@ -813,14 +813,14 @@ namespace Tso2MqoGui
                 string file = Path.Combine(path, import_mat_info.Name);
 
                 if (File.Exists(file))
-                    shader = file;
+                    shader = import_mat_info.Name;
 
                 if (import_mat_info.ShadeTex != null)
                 {
                     file = Path.Combine(path, import_mat_info.ShadeTex.File);
 
                     if (File.Exists(file))
-                        shade_tex = file;
+                        shade_tex = import_mat_info.ShadeTex.File;
                 }
             }
         }
