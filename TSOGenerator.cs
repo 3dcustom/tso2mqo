@@ -83,15 +83,15 @@ namespace Tso2MqoGui
 
             foreach (MaterialInfo i in materials.Values)
             {
-                string name = Path.GetFileNameWithoutExtension(i.ColorTexture);
+                string color_tex_name = Path.GetFileNameWithoutExtension(i.ColorTexture);
 
-                if (!textures.ContainsKey(name))
-                    textures.Add(name, new TextureInfo(name, i.ColorTexture));
+                if (color_tex_name != null && !textures.ContainsKey(color_tex_name))
+                        textures.Add(color_tex_name, new TextureInfo(color_tex_name, i.ColorTexture));
 
-                name = Path.GetFileNameWithoutExtension(i.ShadeTexture);
+                string shade_tex_name = Path.GetFileNameWithoutExtension(i.ShadeTexture);
 
-                if (!textures.ContainsKey(name))
-                    textures.Add(name, new TextureInfo(name, i.ShadeTexture));
+                if (shade_tex_name != null && !textures.ContainsKey(shade_tex_name))
+                        textures.Add(shade_tex_name, new TextureInfo(shade_tex_name, i.ShadeTexture));
             }
 
             return true;
@@ -829,20 +829,19 @@ namespace Tso2MqoGui
         {
             get
             {
-                return File.Exists(shader)
-                    && File.Exists(color_tex)
-                    && File.Exists(shade_tex);
+                return File.Exists(shader);
             }
         }
 
         public string[] GetCode()
         {
             TSOMaterialCode code = TSOMaterialCode.GenerateFromFile(shader);
+            if (color_tex != null)
+                code.SetValue("ColorTex", Path.GetFileNameWithoutExtension(color_tex));
+            if (shade_tex != null)
+                code.SetValue("ShadeTex", Path.GetFileNameWithoutExtension(shade_tex));
+
             List<string> line = new List<string>();
-
-            code.SetValue("ColorTex", Path.GetFileNameWithoutExtension(color_tex));
-            code.SetValue("ShadeTex", Path.GetFileNameWithoutExtension(shade_tex));
-
             foreach (KeyValuePair<string, TSOParameter> i in code)
                 line.Add(i.Value.ToString());
 

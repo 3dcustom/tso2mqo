@@ -176,9 +176,6 @@ namespace Tso2MqoGui
                     meshes[i].sub_meshes[j].numbones = r.ReadInt32();
                     meshes[i].sub_meshes[j].bones = new int[meshes[i].sub_meshes[j].numbones];
 
-                    meshes[i].sub_meshes[j].ink = materials[meshes[i].sub_meshes[j].spec].technique.ToUpper().IndexOf("INKOFF") < 0;
-                    //meshes[i].sub[j].shadow     = specs[meshes[i].sub[j].spec].technique.ToUpper().IndexOf(Shadow
-
                     for (int k = 0; k < meshes[i].sub_meshes[j].numbones; ++k)
                         meshes[i].sub_meshes[j].bones[k] = r.ReadInt32();
 
@@ -552,8 +549,6 @@ namespace Tso2MqoGui
         internal int numvertices;
         internal Vertex[] vertices;
         internal TSOMesh owner;
-        //internal bool           shadow;
-        internal bool ink;
 
         [Category("Detail")]
         public int Spec { get { return spec; } set { spec = value; } }

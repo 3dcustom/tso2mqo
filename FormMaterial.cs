@@ -44,12 +44,12 @@ namespace Tso2MqoGui
                 {
                     string column_name = lvMaterials.Columns[i].Text;
                     string text = item.SubItems[i].Text;
-
+#if false
                     if (text == "")
                         error_message = string.Format("マテリアル名 {0} の {1} を設定する必要があります。", material_name, column_name);
                     else if (!File.Exists(text))
                         error_message = string.Format("マテリアル名 {0} の {1} は存在しません。", material_name, column_name);
-
+#endif
                     if (error_message != null)
                     {
                         MessageBox.Show(error_message);

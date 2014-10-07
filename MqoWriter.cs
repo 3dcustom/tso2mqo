@@ -74,6 +74,7 @@ namespace Tso2MqoGui
             string file = GetTexturePath(tex);
             byte[] data = tex.data;
 
+            //TODO: .bmpのはずが.psdになってるものがある
 
             using (FileStream fs = File.OpenWrite(file))
             {
@@ -98,7 +99,7 @@ namespace Tso2MqoGui
                         bw.Write((byte)0);              // depth
                         break;
 
-                    case ".BMP":
+                    default:
                         bw.Write((byte)'B');
                         bw.Write((byte)'M');
                         bw.Write((int)(54 + data.Length));
@@ -150,9 +151,9 @@ namespace Tso2MqoGui
 
             foreach (TSOMaterial mat in file.materials)
             {
-                if (mat.ColorTex != null)
+                TSOTex tex = null;
+                if (file.texturemap.TryGetValue(mat.ColorTex, out tex))
                 {
-                    TSOTex tex = file.texturemap[mat.ColorTex];
                     tw.WriteLine(
                         "\t\"{0}\" col(1.000 1.000 1.000 1.000) dif(0.800) amb(0.600) emi(0.000) spc(0.000) power(5.00) tex(\"{1}\")",
                         mat.name, GetTextureFileName(tex));
