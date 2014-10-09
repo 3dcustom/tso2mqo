@@ -140,9 +140,7 @@ namespace Tso2MqoGui
             tw.WriteLine("}");
 
             VertexHeap<UVertex> vh = new VertexHeap<UVertex>();
-            List<ushort> face = new List<ushort>(2048 * 3);
-            List<float> uv = new List<float>(2048 * 3 * 2);
-            List<int> mtl = new List<int>(2048);
+            List<MqoFace> face = new List<MqoFace>(2048);
 
             foreach (TSOTex tex in file.textures)
                 CreateTextureFile(tex);
@@ -172,8 +170,6 @@ namespace Tso2MqoGui
             {
                 vh.Clear();
                 face.Clear();
-                uv.Clear();
-                mtl.Clear();
 
                 foreach (TSOSubMesh j in i.sub_meshes)
                 {
@@ -186,24 +182,26 @@ namespace Tso2MqoGui
                         ++cnt;
                         va = vb; a = b;
                         vb = vc; b = c;
-                        vc = k; c = vh.Add(new UVertex(k.Pos, k.Nrm, k.Tex, j.spec));
+                        vc = k; c = vh.Add(new UVertex(k.Pos, k.Nrm, k.Tex));
 
                         if (cnt < 3) continue;
                         if (a == b || b == c || c == a) continue;
 
                         if ((cnt & 1) == 0)
                         {
-                            face.Add(a); uv.Add(va.Tex.x); uv.Add(1 - va.Tex.y);
-                            face.Add(b); uv.Add(vb.Tex.x); uv.Add(1 - vb.Tex.y);
-                            face.Add(c); uv.Add(vc.Tex.x); uv.Add(1 - vc.Tex.y);
-                            mtl.Add(j.spec);
+                            MqoFace f = new MqoFace(a, b, c, (ushort)j.spec,
+                                    new Point2(va.Tex.x, 1 - va.Tex.y),
+                                    new Point2(vb.Tex.x, 1 - vb.Tex.y),
+                                    new Point2(vc.Tex.x, 1 - vc.Tex.y));
+                            face.Add(f);
                         }
                         else
                         {
-                            face.Add(a); uv.Add(va.Tex.x); uv.Add(1 - va.Tex.y);
-                            face.Add(c); uv.Add(vc.Tex.x); uv.Add(1 - vc.Tex.y);
-                            face.Add(b); uv.Add(vb.Tex.x); uv.Add(1 - vb.Tex.y);
-                            mtl.Add(j.spec);
+                            MqoFace f = new MqoFace(a, c, b, (ushort)j.spec,
+                                    new Point2(va.Tex.x, 1 - va.Tex.y),
+                                    new Point2(vc.Tex.x, 1 - vc.Tex.y),
+                                    new Point2(vb.Tex.x, 1 - vb.Tex.y));
+                            face.Add(f);
                         }
                     }
                 }
@@ -225,17 +223,10 @@ namespace Tso2MqoGui
                 tw.WriteLine("\t}");
 
                 //
-                tw.WriteLine("\tface {0} {{", face.Count / 3);
+                tw.WriteLine("\tface {0} {{", face.Count);
 
-                System.Diagnostics.Debug.Assert(face.Count * 2 == uv.Count);
-                System.Diagnostics.Debug.Assert(face.Count == mtl.Count * 3);
-
-                for (int j = 0, n = face.Count; j < n; j += 3)
-                    WriteFace(face[j + 0], face[j + 1], face[j + 2],
-                              uv[j * 2 + 0], uv[j * 2 + 1],
-                              uv[j * 2 + 2], uv[j * 2 + 3],
-                              uv[j * 2 + 4], uv[j * 2 + 5],
-                              mtl[j / 3]);
+                for (int j = 0, n = face.Count; j < n; j++)
+                    WriteFace(face[j]);
                 tw.WriteLine("\t}");
                 tw.WriteLine("}");
             }
@@ -243,7 +234,8 @@ namespace Tso2MqoGui
             // ボーンを出す
             switch (BoneMode)
             {
-                case MqoBoneMode.None: break;
+                case MqoBoneMode.None:
+                    break;
                 case MqoBoneMode.RokDeBone:
                     {
                         // マトリクス計算
@@ -307,18 +299,16 @@ namespace Tso2MqoGui
                     break;
 
                 case MqoBoneMode.Mikoto:
-                    {
-                    }
                     break;
             }
 
             tw.WriteLine("Eof");
         }
 
-        public void WriteFace(int a, int b, int c, float u1, float v1, float u2, float v2, float u3, float v3, int m)
+        public void WriteFace(MqoFace f)
         {
             tw.WriteLine("\t\t{0} V({1} {2} {3}) M({10}) UV({4:F5} {5:F5} {6:F5} {7:F5} {8:F5} {9:F5})",
-                3, a, b, c, u1, v1, u2, v2, u3, v3, m);
+                3, f.a, f.b, f.c, f.ta.x, f.ta.y, f.tb.x, f.tb.y, f.tc.x, f.tc.y, f.mtl);
         }
 
         public void WriteVertex(float x, float y, float z)
@@ -332,18 +322,16 @@ namespace Tso2MqoGui
         public Point3 Pos;
         public Point3 Nrm;
         public Point2 Tex;
-        public int mtl;
 
         public UVertex()
         {
         }
 
-        public UVertex(Point3 pos, Point3 nrm, Point2 tex, int mtl)
+        public UVertex(Point3 pos, Point3 nrm, Point2 tex)
         {
             Pos = pos;
             Nrm = nrm;
             Tex = tex;
-            this.mtl = mtl;
         }
 
         public int CompareTo(UVertex o)
