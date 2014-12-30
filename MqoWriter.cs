@@ -140,7 +140,7 @@ namespace Tso2MqoGui
             tw.WriteLine("}");
 
             VertexHeap<UVertex> vh = new VertexHeap<UVertex>();
-            List<MqoFace> face = new List<MqoFace>(2048);
+            List<MqoFace> faces = new List<MqoFace>(2048);
 
             foreach (TSOTex tex in file.textures)
                 CreateTextureFile(tex);
@@ -166,47 +166,47 @@ namespace Tso2MqoGui
 
             tw.WriteLine("}");
 
-            foreach (TSOMesh i in file.meshes)
+            foreach (TSOMesh mesh in file.meshes)
             {
                 vh.Clear();
-                face.Clear();
+                faces.Clear();
 
-                foreach (TSOSubMesh j in i.sub_meshes)
+                foreach (TSOSubMesh sub_mesh in mesh.sub_meshes)
                 {
                     int cnt = 0;
                     ushort a = 0, b = 0, c = 0;
                     Vertex va = new Vertex(), vb = new Vertex(), vc = new Vertex();
 
-                    foreach (Vertex k in j.vertices)
+                    foreach (Vertex v in sub_mesh.vertices)
                     {
                         ++cnt;
                         va = vb; a = b;
                         vb = vc; b = c;
-                        vc = k; c = vh.Add(new UVertex(k.Pos, k.Nrm, k.Tex));
+                        vc = v; c = vh.Add(new UVertex(v.Pos, v.Nrm));
 
                         if (cnt < 3) continue;
                         if (a == b || b == c || c == a) continue;
 
                         if ((cnt & 1) == 0)
                         {
-                            MqoFace f = new MqoFace(a, b, c, (ushort)j.spec,
+                            MqoFace f = new MqoFace(a, b, c, (ushort)sub_mesh.spec,
                                     new Point2(va.Tex.x, 1 - va.Tex.y),
                                     new Point2(vb.Tex.x, 1 - vb.Tex.y),
                                     new Point2(vc.Tex.x, 1 - vc.Tex.y));
-                            face.Add(f);
+                            faces.Add(f);
                         }
                         else
                         {
-                            MqoFace f = new MqoFace(a, c, b, (ushort)j.spec,
+                            MqoFace f = new MqoFace(a, c, b, (ushort)sub_mesh.spec,
                                     new Point2(va.Tex.x, 1 - va.Tex.y),
                                     new Point2(vc.Tex.x, 1 - vc.Tex.y),
                                     new Point2(vb.Tex.x, 1 - vb.Tex.y));
-                            face.Add(f);
+                            faces.Add(f);
                         }
                     }
                 }
 
-                tw.WriteLine("Object \"{0}\" {{", i.Name);
+                tw.WriteLine("Object \"{0}\" {{", mesh.Name);
                 tw.WriteLine("\tvisible {0}", 15);
                 tw.WriteLine("\tlocking {0}", 0);
                 tw.WriteLine("\tshading {0}", 1);
@@ -217,16 +217,16 @@ namespace Tso2MqoGui
                 //
                 tw.WriteLine("\tvertex {0} {{", vh.Count);
 
-                foreach (UVertex j in vh.verts)
-                    WriteVertex(j.Pos.x, j.Pos.y, j.Pos.z);
+                foreach (UVertex v in vh.verts)
+                    WriteVertex(v.Pos.x, v.Pos.y, v.Pos.z);
 
                 tw.WriteLine("\t}");
 
                 //
-                tw.WriteLine("\tface {0} {{", face.Count);
+                tw.WriteLine("\tface {0} {{", faces.Count);
 
-                for (int j = 0, n = face.Count; j < n; j++)
-                    WriteFace(face[j]);
+                for (int i = 0, n = faces.Count; i < n; i++)
+                    WriteFace(faces[i]);
                 tw.WriteLine("\t}");
                 tw.WriteLine("}");
             }
@@ -321,17 +321,15 @@ namespace Tso2MqoGui
     {
         public Point3 Pos;
         public Point3 Nrm;
-        public Point2 Tex;
 
         public UVertex()
         {
         }
 
-        public UVertex(Point3 pos, Point3 nrm, Point2 tex)
+        public UVertex(Point3 pos, Point3 nrm)
         {
             Pos = pos;
             Nrm = nrm;
-            Tex = tex;
         }
 
         public int CompareTo(UVertex o)
@@ -351,20 +349,20 @@ namespace Tso2MqoGui
         {
             if (obj is UVertex)
             {
-                UVertex v = (UVertex)obj;
-                return Pos.Equals(v.Pos) && Nrm.Equals(v.Nrm);
+                UVertex o = (UVertex)obj;
+                return Pos.Equals(o.Pos) && Nrm.Equals(o.Nrm);
             }
             return false;
         }
 
-        public bool Equals(UVertex v)
+        public bool Equals(UVertex o)
         {
-            if ((object)v == null)
+            if ((object)o == null)
             {
                 return false;
             }
 
-            return Pos.Equals(v.Pos) && Nrm.Equals(v.Nrm);
+            return Pos.Equals(o.Pos) && Nrm.Equals(o.Nrm);
         }
     }
 }
