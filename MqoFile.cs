@@ -130,15 +130,29 @@ namespace Tso2MqoGui
 
         private bool SectionRoot(string[] tokens)
         {
-            switch (tokens[0].ToLower())
+            switch (tokens[0])
             {
-                case "metasequoia": ParseMetasequoia(tokens); return true;
-                case "format": ParseFormat(tokens); return true;
-                case "scene": ParseScene(tokens); return true;
-                case "material": ParseMaterial(tokens); return true;
-                case "object": ParseObject(tokens); return true;
-                case "eof": return false;
-                default: return true;
+                case "Metasequoia": ParseMetasequoia(tokens); return true;
+                case "Format": ParseFormat(tokens); return true;
+                case "Thumbnail": ParseThumbnail(tokens); return true;
+                case "Scene": ParseScene(tokens); return true;
+                case "Material": ParseMaterial(tokens); return true;
+                case "Object": ParseObject(tokens); return true;
+                case "Eof":
+                    return false;
+                default:
+                    return true;
+            }
+        }
+
+        private bool SectionThumbnail(string[] tokens)
+        {
+            switch (tokens[0])
+            {
+                case "}":
+                    return false;
+                default:
+                    return true;
             }
         }
 
@@ -146,7 +160,7 @@ namespace Tso2MqoGui
         {
             scene = new MqoScene();
 
-            switch (tokens[0].ToLower())
+            switch (tokens[0])
             {
                 case "pos": scene.pos = Point3.Parse(tokens, 1); return true;
                 case "lookat": scene.lookat = Point3.Parse(tokens, 1); return true;
@@ -155,8 +169,34 @@ namespace Tso2MqoGui
                 case "ortho": scene.ortho = float.Parse(tokens[1]); return true;
                 case "zoom2": scene.zoom2 = float.Parse(tokens[1]); return true;
                 case "amb": scene.amb = Color3.Parse(tokens, 1); return true;
-                case "}": return false;
-                default: return true;
+                case "dirlights": ParseDirlights(tokens); return true;
+                case "}":
+                    return false;
+                default:
+                    return true;
+            }
+        }
+
+        private bool SectionDirlights(string[] tokens)
+        {
+            switch (tokens[0])
+            {
+                case "light": ParseLight(tokens); return true;
+                case "}":
+                    return false;
+                default:
+                    return true;
+            }
+        }
+
+        private bool SectionLight(string[] tokens)
+        {
+            switch (tokens[0])
+            {
+                case "}":
+                    return false;
+                default:
+                    return true;
             }
         }
 
@@ -200,7 +240,7 @@ namespace Tso2MqoGui
 
         private bool SectionObject(string[] tokens)
         {
-            switch (tokens[0].ToLower())
+            switch (tokens[0])
             {
                 case "visible": current.visible = int.Parse(tokens[1]); return true;
                 case "locking": current.locking = int.Parse(tokens[1]); return true;
@@ -210,8 +250,10 @@ namespace Tso2MqoGui
                 case "color_type": current.color_type = int.Parse(tokens[1]); return true;
                 case "vertex": ParseVertex(tokens); return true;
                 case "face": ParseFace(tokens); return true;
-                case "}": return false;
-                default: return true;
+                case "}":
+                    return false;
+                default:
+                    return true;
             }
         }
 
@@ -324,14 +366,33 @@ namespace Tso2MqoGui
         //----- Root elements ----------------------------------------------
         private void ParseMetasequoia(string[] tokens)
         {
-            if (tokens[1].ToLower() != "document") Error(tokens);
+            // Metasequoia Document
+            if (tokens[1] != "Document")
+                Error(tokens);
         }
 
         private void ParseFormat(string[] tokens)
         {
-            if (tokens[1].ToLower() != "text") Error(tokens);
-            if (tokens[2].ToLower() != "ver") Error(tokens);
-            if (tokens[3].ToLower() != "1.0") Error(tokens);
+            // @since v2.2
+            // Format Text Ver 1.0
+            // @since v4.0
+            // Format Text Ver 1.1
+            if (tokens[1] != "Text")
+                Error(tokens);
+            if (tokens[2] != "Ver")
+                Error(tokens);
+            if (tokens[3] != "1.0" && tokens[3] != "1.1")
+                    Error(tokens);
+        }
+
+        private void ParseThumbnail(string[] tokens)
+        {
+            // Thumbnail 128 128 24 rgb raw {
+            // ...
+            // }
+            if (tokens[6] != "{") Error(tokens);
+
+            DoRead(SectionThumbnail);
         }
 
         private void ParseScene(string[] tokens)
@@ -339,6 +400,26 @@ namespace Tso2MqoGui
             if (tokens[1].ToLower() != "{") Error(tokens);
 
             DoRead(SectionScene);
+        }
+
+        private void ParseDirlights(string[] tokens)
+        {
+            // dirlights 1 {
+            // ...
+            // }
+            if (tokens[2].ToLower() != "{") Error(tokens);
+
+            DoRead(SectionDirlights);
+        }
+
+        private void ParseLight(string[] tokens)
+        {
+            // light {
+            // ...
+            // }
+            if (tokens[1].ToLower() != "{") Error(tokens);
+
+            DoRead(SectionLight);
         }
 
         private void ParseMaterial(string[] tokens)
