@@ -198,6 +198,38 @@ namespace Tso2MqoGui
 
             r.BaseStream.Dispose();
         }
+
+        // ボーンをグローバルな番号に変換
+        public unsafe void SwitchBoneIndicesOnMesh()
+        {
+            foreach (TSOMesh mesh in this.meshes)
+                foreach (TSOSubMesh sub in mesh.sub_meshes)
+                {
+                    int[] bones = sub.bones;
+
+                    for (int k = 0, n = sub.numvertices; k < n; ++k)
+                    {
+                        uint idx0 = sub.vertices[k].Idx;
+                        byte* idx = (byte*)(&idx0);
+                        idx[0] = (byte)bones[idx[0]];
+                        idx[1] = (byte)bones[idx[1]];
+                        idx[2] = (byte)bones[idx[2]];
+                        idx[3] = (byte)bones[idx[3]];
+                        sub.vertices[k].Idx = idx0;
+                    }
+                }
+        }
+
+        public void UpdateNodesWorld()
+        {
+            foreach (TSONode node in this.nodes)
+            {
+                if (node.parent == null)
+                    node.world = node.Matrix;
+                else
+                    node.world = Matrix44.Mul(node.matrix, node.parent.world);
+            }
+        }
     }
 
     public class TSONode

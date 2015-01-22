@@ -7,6 +7,13 @@ namespace Tso2MqoGui
 {
     public class MqoGenerator
     {
+        public TSOFile LoadTSO(string file)
+        {
+            TSOFile tso = new TSOFile(file);
+            tso.ReadAll();
+            return tso;
+        }
+
         public void Generate(string tso_file, string out_path, MqoBoneMode bone_mode)
         {
             string tso_filename = Path.GetFileName(tso_file);
@@ -16,8 +23,8 @@ namespace Tso2MqoGui
             // モデル、テクスチャの作成
             using (MqoWriter mqo = new MqoWriter(mqo_file))
             {
-                TSOFile tso = new TSOFile(tso_file);
-                tso.ReadAll();
+                TSOFile tso = LoadTSO(tso_file);
+                tso.SwitchBoneIndicesOnMesh();
 
                 mqo.BoneMode = bone_mode;
 

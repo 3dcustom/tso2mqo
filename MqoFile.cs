@@ -8,16 +8,16 @@ namespace Tso2MqoGui
 {
     public class MqoFile
     {
-        private delegate bool SectionHandler(string[] tokens);
+        delegate bool SectionHandler(string[] tokens);
 
-        private static char[] delimiters2 = new char[] { ' ', '\t', '(', ')' };
+        static char[] param_delimiters = new char[] { ' ', '\t', '(', ')' };
 
-        private string file;
-        private StreamReader sr;
-        private MqoScene scene;
-        private List<MqoMaterial> materials;
-        private List<MqoObject> objects = new List<MqoObject>();
-        private MqoObject current;
+        string file;
+        StreamReader sr;
+        MqoScene scene;
+        List<MqoMaterial> materials;
+        List<MqoObject> objects = new List<MqoObject>();
+        MqoObject current;
 
         public MqoScene Scene { get { return scene; } }
         public List<MqoMaterial> Materials { get { return materials; } }
@@ -38,7 +38,7 @@ namespace Tso2MqoGui
             DoRead(SectionRoot);
         }
 
-        private static string[] SplitString(string s)
+        static string[] SplitString(string s)
         {
             List<string> tokens = new List<string>();
             StringBuilder sb = new StringBuilder(s.Length);
@@ -95,9 +95,9 @@ namespace Tso2MqoGui
             return tokens.ToArray();
         }
 
-        private void DoRead(SectionHandler h)
+        void DoRead(SectionHandler h)
         {
-            for (int no = 1; ; ++no)
+            for (int lineno = 1; ; ++lineno)
             {
                 string line = sr.ReadLine();
 
@@ -117,27 +117,79 @@ namespace Tso2MqoGui
                 }
                 catch (Exception exception)
                 {
-                    string msg = string.Format("File format error: {0} \"{1}\"", no, line);
-                    throw new Exception(msg, exception);
+                    throw new Exception(string.Format("File format error: {0} \"{1}\"", lineno, line), exception);
                 }
             }
         }
 
         public void Error(string[] tokens)
         {
-            throw new Exception("File Format Error: \"" + string.Concat(tokens) + "\"");
+            throw new Exception(string.Format("File Format Error: \"{0}\"", string.Concat(tokens)));
         }
 
-        private bool SectionRoot(string[] tokens)
+        bool SectionRoot(string[] tokens)
         {
             switch (tokens[0])
             {
-                case "Metasequoia": ParseMetasequoia(tokens); return true;
-                case "Format": ParseFormat(tokens); return true;
-                case "Thumbnail": ParseThumbnail(tokens); return true;
-                case "Scene": ParseScene(tokens); return true;
-                case "Material": ParseMaterial(tokens); return true;
-                case "Object": ParseObject(tokens); return true;
+                case "Metasequoia":
+                    {
+                        // Metasequoia Document
+                        if (tokens[1] != "Document")
+                            Error(tokens);
+                    }
+                    return true;
+                case "Format":
+                    {
+                        // @since v2.2
+                        // Format Text Ver 1.0
+                        // @since v4.0
+                        // Format Text Ver 1.1
+                        if (tokens[1] != "Text")
+                            Error(tokens);
+                        if (tokens[2] != "Ver")
+                            Error(tokens);
+                        if (tokens[3] != "1.0" && tokens[3] != "1.1")
+                            Error(tokens);
+                    }
+                    return true;
+                case "Thumbnail":
+                    {
+                        // Thumbnail 128 128 24 rgb raw {
+                        // ...
+                        // }
+                        if (tokens[6] != "{")
+                            Error(tokens);
+
+                        DoRead(SectionThumbnail);
+                    }
+                    return true;
+                case "Scene":
+                    {
+                        if (tokens[1] != "{")
+                            Error(tokens);
+
+                        DoRead(SectionScene);
+                    }
+                    return true;
+                case "Material":
+                    {
+                        if (tokens[2] != "{")
+                            Error(tokens);
+
+                        materials = new List<MqoMaterial>(int.Parse(tokens[1]));
+                        DoRead(SectionMaterial);
+                    }
+                    return true;
+                case "Object":
+                    {
+                        if (tokens[2] != "{")
+                            Error(tokens);
+
+                        current = new MqoObject(tokens[1].Trim('"'));
+                        objects.Add(current);
+                        DoRead(SectionObject);
+                    }
+                    return true;
                 case "Eof":
                     return false;
                 default:
@@ -145,7 +197,7 @@ namespace Tso2MqoGui
             }
         }
 
-        private bool SectionThumbnail(string[] tokens)
+        bool SectionThumbnail(string[] tokens)
         {
             switch (tokens[0])
             {
@@ -156,7 +208,7 @@ namespace Tso2MqoGui
             }
         }
 
-        private bool SectionScene(string[] tokens)
+        bool SectionScene(string[] tokens)
         {
             scene = new MqoScene();
 
@@ -169,7 +221,17 @@ namespace Tso2MqoGui
                 case "ortho": scene.ortho = float.Parse(tokens[1]); return true;
                 case "zoom2": scene.zoom2 = float.Parse(tokens[1]); return true;
                 case "amb": scene.amb = Color3.Parse(tokens, 1); return true;
-                case "dirlights": ParseDirlights(tokens); return true;
+                case "dirlights":
+                    {
+                        // dirlights 1 {
+                        // ...
+                        // }
+                        if (tokens[2] != "{")
+                            Error(tokens);
+
+                        DoRead(SectionDirlights);
+                    }
+                    return true;
                 case "}":
                     return false;
                 default:
@@ -177,35 +239,43 @@ namespace Tso2MqoGui
             }
         }
 
-        private bool SectionDirlights(string[] tokens)
+        bool SectionDirlights(string[] tokens)
         {
             switch (tokens[0])
             {
-                case "light": ParseLight(tokens); return true;
+                case "light":
+                    {
+                        // light {
+                        // ...
+                        // }
+                        if (tokens[1] != "{")
+                            Error(tokens);
+
+                        DoRead(SectionLight);
+                    }
+                    break;
                 case "}":
                     return false;
-                default:
-                    return true;
             }
+            return true;
         }
 
-        private bool SectionLight(string[] tokens)
+        bool SectionLight(string[] tokens)
         {
             switch (tokens[0])
             {
                 case "}":
                     return false;
-                default:
-                    return true;
             }
+            return true;
         }
 
-        private static string[] SplitParam(string s)
+        static string[] SplitParam(string s)
         {
-            return s.Split(delimiters2, StringSplitOptions.RemoveEmptyEntries);
+            return s.Split(param_delimiters, StringSplitOptions.RemoveEmptyEntries);
         }
 
-        private bool SectionMaterial(string[] tokens)
+        bool SectionMaterial(string[] tokens)
         {
             if (tokens[0] == "}")
                 return false;
@@ -238,26 +308,44 @@ namespace Tso2MqoGui
             return true;
         }
 
-        private bool SectionObject(string[] tokens)
+        bool SectionObject(string[] tokens)
         {
             switch (tokens[0])
             {
-                case "visible": current.visible = int.Parse(tokens[1]); return true;
-                case "locking": current.locking = int.Parse(tokens[1]); return true;
-                case "shading": current.shading = int.Parse(tokens[1]); return true;
-                case "facet": current.facet = float.Parse(tokens[1]); return true;
-                case "color": current.color = Color3.Parse(tokens, 1); return true;
-                case "color_type": current.color_type = int.Parse(tokens[1]); return true;
-                case "vertex": ParseVertex(tokens); return true;
-                case "face": ParseFace(tokens); return true;
+                case "visible": current.visible = int.Parse(tokens[1]); break;
+                case "locking": current.locking = int.Parse(tokens[1]); break;
+                case "shading": current.shading = int.Parse(tokens[1]); break;
+                case "facet": current.facet = float.Parse(tokens[1]); break;
+                case "color": current.color = Color3.Parse(tokens, 1); break;
+                case "color_type": current.color_type = int.Parse(tokens[1]); break;
+                case "vertex":
+                    {
+                        if (tokens[2] != "{")
+                            Error(tokens);
+
+                        current.vertices = new List<Point3>(int.Parse(tokens[1]));
+                        DoRead(SectionVertex);
+                    }
+                    break;
+                case "vertexattr":
+                    DoRead(SectionVertexAttr);
+                    break;
+                case "face":
+                    {
+                        if (tokens[2] != "{")
+                            Error(tokens);
+
+                        current.faces = new List<MqoFace>(int.Parse(tokens[1]));
+                        DoRead(SectionFace);
+                    }
+                    break;
                 case "}":
                     return false;
-                default:
-                    return true;
             }
+            return true;
         }
 
-        private bool SectionVertex(string[] tokens)
+        bool SectionVertex(string[] tokens)
         {
             if (tokens[0] == "}")
                 return false;
@@ -267,7 +355,38 @@ namespace Tso2MqoGui
             return true;
         }
 
-        private bool SectionFace(string[] tokens)
+        bool SectionVertexAttr(string[] tokens)
+        {
+            switch (tokens[0])
+            {
+                case "uid":
+                    {
+                        // uid {
+                        // ...
+                        // }
+                        if (tokens[1] != "{")
+                            Error(tokens);
+
+                        DoRead(SectionUid);
+                    }
+                    break;
+                case "}":
+                    return false;
+            }
+            return true;
+        }
+
+        bool SectionUid(string[] tokens)
+        {
+            switch (tokens[0])
+            {
+                case "}":
+                    return false;
+            }
+            return true;
+        }
+
+        bool SectionFace(string[] tokens)
         {
             if (tokens[0] == "}")
                 return false;
@@ -298,20 +417,18 @@ namespace Tso2MqoGui
                                 f.b = ushort.Parse(t3[2]);
                                 f.c = ushort.Parse(t3[3]);
                             }
-                            else
-                                if (t2.StartsWith("m("))
-                                {
-                                    string[] t3 = SplitParam(t);
-                                    f.mtl = ushort.Parse(t3[1]);
-                                }
-                                else
-                                    if (t2.StartsWith("uv("))
-                                    {
-                                        string[] t3 = SplitParam(t);
-                                        f.ta = Point2.Parse(t3, 1);
-                                        f.tb = Point2.Parse(t3, 3);
-                                        f.tc = Point2.Parse(t3, 5);
-                                    }
+                            else if (t2.StartsWith("m("))
+                            {
+                                string[] t3 = SplitParam(t);
+                                f.mtl = ushort.Parse(t3[1]);
+                            }
+                            else if (t2.StartsWith("uv("))
+                            {
+                                string[] t3 = SplitParam(t);
+                                f.ta = Point2.Parse(t3, 1);
+                                f.tb = Point2.Parse(t3, 3);
+                                f.tc = Point2.Parse(t3, 5);
+                            }
                         }
                         current.faces.Add(f);
                     }
@@ -336,24 +453,22 @@ namespace Tso2MqoGui
                                 f2.b = f.c;
                                 f2.c = ushort.Parse(t3[4]);
                             }
-                            else
-                                if (t2.StartsWith("m("))
-                                {
-                                    string[] t3 = SplitParam(t);
-                                    f.mtl = ushort.Parse(t3[1]);
-                                    f2.mtl = f.mtl;
-                                }
-                                else
-                                    if (t2.StartsWith("uv("))
-                                    {
-                                        string[] t3 = SplitParam(t);
-                                        f.ta = Point2.Parse(t3, 1);
-                                        f.tb = Point2.Parse(t3, 3);
-                                        f.tc = Point2.Parse(t3, 5);
-                                        f2.ta = f.ta;
-                                        f2.tb = f.tc;
-                                        f2.tc = Point2.Parse(t3, 7);
-                                    }
+                            else if (t2.StartsWith("m("))
+                            {
+                                string[] t3 = SplitParam(t);
+                                f.mtl = ushort.Parse(t3[1]);
+                                f2.mtl = f.mtl;
+                            }
+                            else if (t2.StartsWith("uv("))
+                            {
+                                string[] t3 = SplitParam(t);
+                                f.ta = Point2.Parse(t3, 1);
+                                f.tb = Point2.Parse(t3, 3);
+                                f.tc = Point2.Parse(t3, 5);
+                                f2.ta = f.ta;
+                                f2.tb = f.tc;
+                                f2.tc = Point2.Parse(t3, 7);
+                            }
                         }
                         current.faces.Add(f);
                         current.faces.Add(f2);
@@ -361,98 +476,6 @@ namespace Tso2MqoGui
                     break;
             }
             return true;
-        }
-
-        //----- Root elements ----------------------------------------------
-        private void ParseMetasequoia(string[] tokens)
-        {
-            // Metasequoia Document
-            if (tokens[1] != "Document")
-                Error(tokens);
-        }
-
-        private void ParseFormat(string[] tokens)
-        {
-            // @since v2.2
-            // Format Text Ver 1.0
-            // @since v4.0
-            // Format Text Ver 1.1
-            if (tokens[1] != "Text")
-                Error(tokens);
-            if (tokens[2] != "Ver")
-                Error(tokens);
-            if (tokens[3] != "1.0" && tokens[3] != "1.1")
-                    Error(tokens);
-        }
-
-        private void ParseThumbnail(string[] tokens)
-        {
-            // Thumbnail 128 128 24 rgb raw {
-            // ...
-            // }
-            if (tokens[6] != "{") Error(tokens);
-
-            DoRead(SectionThumbnail);
-        }
-
-        private void ParseScene(string[] tokens)
-        {
-            if (tokens[1].ToLower() != "{") Error(tokens);
-
-            DoRead(SectionScene);
-        }
-
-        private void ParseDirlights(string[] tokens)
-        {
-            // dirlights 1 {
-            // ...
-            // }
-            if (tokens[2].ToLower() != "{") Error(tokens);
-
-            DoRead(SectionDirlights);
-        }
-
-        private void ParseLight(string[] tokens)
-        {
-            // light {
-            // ...
-            // }
-            if (tokens[1].ToLower() != "{") Error(tokens);
-
-            DoRead(SectionLight);
-        }
-
-        private void ParseMaterial(string[] tokens)
-        {
-            if (tokens[2].ToLower() != "{") Error(tokens);
-
-            materials = new List<MqoMaterial>(int.Parse(tokens[1]));
-            DoRead(SectionMaterial);
-        }
-
-        private void ParseObject(string[] tokens)
-        {
-            if (tokens[2].ToLower() != "{") Error(tokens);
-
-            current = new MqoObject(tokens[1].Trim('"'));
-            objects.Add(current);
-            DoRead(SectionObject);
-        }
-
-        private void ParseVertex(string[] tokens)
-        {
-            if (tokens[2].ToLower() != "{") Error(tokens);
-
-            current.vertices = new List<Point3>(int.Parse(tokens[1]));
-            DoRead(SectionVertex);
-        }
-
-        private void ParseFace(string[] tokens)
-        {
-            if (tokens[2].ToLower() != "{") Error(tokens);
-
-            current.faces = new List<MqoFace>(int.Parse(tokens[1]));
-            DoRead(SectionFace);
         }
     }
 
@@ -517,6 +540,12 @@ namespace Tso2MqoGui
             this.ta = ta;
             this.tb = tb;
             this.tc = tc;
+        }
+
+        public void Write(TextWriter tw)
+        {
+            tw.WriteLine("\t\t{0} V({1} {2} {3}) M({10}) UV({4:F5} {5:F5} {6:F5} {7:F5} {8:F5} {9:F5})",
+                3, a, b, c, ta.x, ta.y, tb.x, tb.y, tc.x, tc.y, mtl);
         }
     }
 }

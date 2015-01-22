@@ -162,7 +162,7 @@
             this.rbBoneRokDeBone.Size = new System.Drawing.Size(170, 16);
             this.rbBoneRokDeBone.TabIndex = 7;
             this.rbBoneRokDeBone.TabStop = true;
-            this.rbBoneRokDeBone.Text = "RokDeBone形式のボーン作成";
+            this.rbBoneRokDeBone.Text = "Mqx形式のボーン作成";
             this.rbBoneRokDeBone.UseVisualStyleBackColor = true;
             // 
             // rbBoneNone
@@ -599,7 +599,7 @@
             this.Controls.Add(this.tabControl1);
             this.MinimumSize = new System.Drawing.Size(528, 200);
             this.Name = "Form1";
-            this.Text = "Tso2MqoGui v0.36";
+            this.Text = "Tso2MqoGui v0.37";
             this.Load += new System.EventHandler(this.Form1_Load);
             this.DragDrop += new System.Windows.Forms.DragEventHandler(this.Form1_DragDrop);
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.Form1_FormClosed);

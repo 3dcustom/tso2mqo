@@ -579,25 +579,7 @@ namespace Tso2MqoGui
         {
             // 参照TSOロード
             tsoref = LoadTSO(tsoref_file);
-
-            foreach (TSOMesh mesh in tsoref.meshes)
-                foreach (TSOSubMesh sub in mesh.sub_meshes)
-                {
-                    int[] bones = sub.bones;
-
-                    for (int k = 0, n = sub.numvertices; k < n; ++k)
-                    {
-                        // ボーンをグローバルな番号に変換
-                        uint idx0 = sub.vertices[k].Idx;
-                        byte* idx = (byte*)(&idx0);
-                        idx[0] = (byte)bones[idx[0]];
-                        idx[1] = (byte)bones[idx[1]];
-                        idx[2] = (byte)bones[idx[2]];
-                        idx[3] = (byte)bones[idx[3]];
-                        sub.vertices[k].Idx = idx0;
-                    }
-                }
-
+            tsoref.SwitchBoneIndicesOnMesh();
             CreatePointCluster(tsoref);
             return true;
         }
