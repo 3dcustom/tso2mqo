@@ -459,8 +459,8 @@ namespace Tso2MqoGui
 
                 foreach (MqoFace face in obj.faces)
                 {
-                    Point3 v1 = Point3.Normalize(obj.vertices[face.b] - obj.vertices[face.a]);
-                    Point3 v2 = Point3.Normalize(obj.vertices[face.c] - obj.vertices[face.b]);
+                    Point3 v1 = Point3.Normalize(obj.vertices[face.b].Pos - obj.vertices[face.a].Pos);
+                    Point3 v2 = Point3.Normalize(obj.vertices[face.c].Pos - obj.vertices[face.b].Pos);
                     Point3 n = Point3.Normalize(Point3.Cross(v1, v2));
                     normal[face.a] -= n;
                     normal[face.b] -= n;
@@ -502,9 +502,9 @@ namespace Tso2MqoGui
                         if (face.mtl != mtl)
                             continue;
 
-                        Vertex va = new Vertex(obj.vertices[face.a], wgt, idx, normal[face.a], new Point2(face.ta.x, 1 - face.ta.y));
-                        Vertex vb = new Vertex(obj.vertices[face.b], wgt, idx, normal[face.b], new Point2(face.tb.x, 1 - face.tb.y));
-                        Vertex vc = new Vertex(obj.vertices[face.c], wgt, idx, normal[face.c], new Point2(face.tc.x, 1 - face.tc.y));
+                        Vertex va = new Vertex(obj.vertices[face.a].Pos, wgt, idx, normal[face.a], new Point2(face.ta.x, 1 - face.ta.y));
+                        Vertex vb = new Vertex(obj.vertices[face.b].Pos, wgt, idx, normal[face.b], new Point2(face.tb.x, 1 - face.tb.y));
+                        Vertex vc = new Vertex(obj.vertices[face.c].Pos, wgt, idx, normal[face.c], new Point2(face.tc.x, 1 - face.tc.y));
 
                         indices.Add(vh.Add(va));
                         indices.Add(vh.Add(vc));
@@ -598,16 +598,16 @@ namespace Tso2MqoGui
                 // 一番近い頂点への参照
                 List<int> vref = new List<int>(obj.vertices.Count);
 
-                foreach (Point3 j in obj.vertices)
-                    vref.Add(pc.NearestIndex(j.x, j.y, j.z));
+                foreach (UVertex j in obj.vertices)
+                    vref.Add(pc.NearestIndex(j.Pos.x, j.Pos.y, j.Pos.z));
 
                 // 法線生成
                 Point3[] normal = new Point3[obj.vertices.Count];
 
                 foreach (MqoFace face in obj.faces)
                 {
-                    Point3 v1 = Point3.Normalize(obj.vertices[face.b] - obj.vertices[face.a]);
-                    Point3 v2 = Point3.Normalize(obj.vertices[face.c] - obj.vertices[face.b]);
+                    Point3 v1 = Point3.Normalize(obj.vertices[face.b].Pos - obj.vertices[face.a].Pos);
+                    Point3 v2 = Point3.Normalize(obj.vertices[face.c].Pos - obj.vertices[face.b].Pos);
                     Point3 n = Point3.Normalize(Point3.Cross(v1, v2));
 
                     normal[face.a] -= n;
@@ -693,9 +693,9 @@ namespace Tso2MqoGui
                         }
 
                         // \todo 点の追加
-                        Vertex va = new Vertex(obj.vertices[f.a], v[0].Wgt, v[0].Idx, normal[f.a], new Point2(f.ta.x, 1 - f.ta.y));
-                        Vertex vb = new Vertex(obj.vertices[f.b], v[1].Wgt, v[1].Idx, normal[f.b], new Point2(f.tb.x, 1 - f.tb.y));
-                        Vertex vc = new Vertex(obj.vertices[f.c], v[2].Wgt, v[2].Idx, normal[f.c], new Point2(f.tc.x, 1 - f.tc.y));
+                        Vertex va = new Vertex(obj.vertices[f.a].Pos, v[0].Wgt, v[0].Idx, normal[f.a], new Point2(f.ta.x, 1 - f.ta.y));
+                        Vertex vb = new Vertex(obj.vertices[f.b].Pos, v[1].Wgt, v[1].Idx, normal[f.b], new Point2(f.tb.x, 1 - f.tb.y));
+                        Vertex vc = new Vertex(obj.vertices[f.c].Pos, v[2].Wgt, v[2].Idx, normal[f.c], new Point2(f.tc.x, 1 - f.tc.y));
 
                         indices.Add(vh.Add(va));
                         indices.Add(vh.Add(vc));

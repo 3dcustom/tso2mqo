@@ -323,7 +323,7 @@ namespace Tso2MqoGui
                         if (tokens[2] != "{")
                             Error(tokens);
 
-                        current.vertices = new List<Point3>(int.Parse(tokens[1]));
+                        current.vertices = new List<UVertex>(int.Parse(tokens[1]));
                         DoRead(SectionVertex);
                     }
                     break;
@@ -355,7 +355,9 @@ namespace Tso2MqoGui
             if (tokens[0] == "}")
                 return false;
 
-            current.vertices.Add(Point3.Parse(tokens, 0));
+            UVertex v = new UVertex();
+            v.Pos = Point3.Parse(tokens, 0);
+            current.vertices.Add(v);
 
             return true;
         }
@@ -520,7 +522,7 @@ namespace Tso2MqoGui
         public float facet;
         public Color3 color;
         public int color_type;
-        public List<Point3> vertices;
+        public List<UVertex> vertices;
         public List<MqoFace> faces;
 
         public MqoObject() { }
