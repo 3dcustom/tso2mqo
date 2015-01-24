@@ -527,6 +527,25 @@ namespace Tso2MqoGui
 
         public MqoObject() { }
         public MqoObject(string n) { name = n; }
+
+        public void CreateNormal()
+        {
+            // 法線生成
+            Point3[] normal = new Point3[vertices.Count];
+
+            foreach (MqoFace face in faces)
+            {
+                Point3 v1 = Point3.Normalize(vertices[face.b].Pos - vertices[face.a].Pos);
+                Point3 v2 = Point3.Normalize(vertices[face.c].Pos - vertices[face.b].Pos);
+                Point3 n = Point3.Normalize(Point3.Cross(v1, v2));
+                normal[face.a] -= n;
+                normal[face.b] -= n;
+                normal[face.c] -= n;
+            }
+
+            for (int i = 0; i < normal.Length; ++i)
+                vertices[i].Nrm = Point3.Normalize(normal[i]);
+        }
     }
 
     public class UVertex : IComparable<UVertex>
