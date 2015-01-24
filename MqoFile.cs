@@ -328,7 +328,12 @@ namespace Tso2MqoGui
                     }
                     break;
                 case "vertexattr":
-                    DoRead(SectionVertexAttr);
+                    {
+                        if (tokens[1] != "{")
+                            Error(tokens);
+
+                        DoRead(SectionVertexAttr);
+                    }
                     break;
                 case "face":
                     {
