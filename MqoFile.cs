@@ -529,6 +529,65 @@ namespace Tso2MqoGui
         public MqoObject(string n) { name = n; }
     }
 
+    public class UVertex : IComparable<UVertex>
+    {
+        //public int id; //vertex_id
+        public Point3 Pos;
+        public Point4 Wgt;
+        public UInt32 Idx;
+        public Point3 Nrm;
+
+        public UVertex()
+        {
+        }
+
+        public UVertex(Point3 pos, Point4 wgt, UInt32 idx, Point3 nrm)
+        {
+            Pos = pos;
+            Wgt = wgt;
+            Idx = idx;
+            Nrm = nrm;
+        }
+
+        public int CompareTo(UVertex o)
+        {
+            int cmp;
+            cmp = Pos.CompareTo(o.Pos); if (cmp != 0) return cmp;
+            cmp = Nrm.CompareTo(o.Nrm);
+            return cmp;
+        }
+
+        public override int GetHashCode()
+        {
+            return Pos.GetHashCode() ^ Nrm.GetHashCode();
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (obj is UVertex)
+            {
+                UVertex o = (UVertex)obj;
+                return Pos.Equals(o.Pos) && Nrm.Equals(o.Nrm);
+            }
+            return false;
+        }
+
+        public bool Equals(UVertex o)
+        {
+            if ((object)o == null)
+            {
+                return false;
+            }
+
+            return Pos.Equals(o.Pos) && Nrm.Equals(o.Nrm);
+        }
+
+        public void Write(TextWriter tw)
+        {
+            tw.WriteLine("\t\t{0:F4} {1:F4} {2:F4}", Pos.x, Pos.y, Pos.z);
+        }
+    }
+
     public class MqoFace
     {
         public ushort a, b, c, mtl;
