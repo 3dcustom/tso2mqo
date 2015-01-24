@@ -312,6 +312,7 @@ namespace Tso2MqoGui
         {
             switch (tokens[0])
             {
+                case "uid": current.id = int.Parse(tokens[1]); break;
                 case "visible": current.visible = int.Parse(tokens[1]); break;
                 case "locking": current.locking = int.Parse(tokens[1]); break;
                 case "shading": current.shading = int.Parse(tokens[1]); break;
@@ -374,7 +375,7 @@ namespace Tso2MqoGui
                         if (tokens[1] != "{")
                             Error(tokens);
 
-                        DoRead(SectionUid);
+                        DoReadSectionUid();
                     }
                     break;
                 case "}":
@@ -383,14 +384,35 @@ namespace Tso2MqoGui
             return true;
         }
 
-        bool SectionUid(string[] tokens)
+        void DoReadSectionUid()
         {
-            switch (tokens[0])
+            int i = 0;
+
+            for (int lineno = 1; ; ++lineno)
             {
-                case "}":
-                    return false;
+                string line = sr.ReadLine();
+
+                if (line == null)
+                    break;
+
+                line = line.Trim();
+                string[] tokens = SplitString(line);
+
+                try
+                {
+                    if (tokens.Length == 0)
+                        continue;
+
+                    if (tokens[0] == "}")
+                        break;
+
+                    current.vertices[i++].id = int.Parse(tokens[0]);
+                }
+                catch (Exception exception)
+                {
+                    throw new Exception(string.Format("File format error: {0} \"{1}\"", lineno, line), exception);
+                }
             }
-            return true;
         }
 
         bool SectionFace(string[] tokens)
@@ -515,6 +537,7 @@ namespace Tso2MqoGui
 
     public class MqoObject
     {
+        public int id; //object_id
         public string name;
         public int visible;
         public int locking;
@@ -550,7 +573,7 @@ namespace Tso2MqoGui
 
     public class UVertex : IComparable<UVertex>
     {
-        //public int id; //vertex_id
+        public int id; //vertex_id
         public Point3 Pos;
         public Point4 Wgt;
         public UInt32 Idx;
