@@ -201,18 +201,18 @@ namespace Tso2MqoGui
             foreach (TSONode node in tso.nodes)
             {
                 MqoBone bone = new MqoBone();
-                bone.id = node.id;
+                bone.id = node.id+1;
                 bone.name = node.ShortName;
                 bone.tail = node.children.Count == 0;
 
                 if (node.parent == null)
                 {
-                    bone.pid = -1;
+                    bone.pid = 0;
                 }
                 else
                 {
-                    bone.pid = node.parent.id;
-                    bones[bone.pid].cids.Add(bone.id);
+                    bone.pid = node.parent.id+1;
+                    bones[node.parent.id].cids.Add(bone.id);
                 }
 
                 //根本

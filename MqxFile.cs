@@ -11,7 +11,7 @@ namespace Tso2MqoGui
         public int id;
         public string name;
         public bool tail;
-        //‚È‚¯‚ê‚Î-1
+        //‚È‚¯‚ê‚Î0
         public int pid;
         public List<int> cids = new List<int>();
 
@@ -31,7 +31,7 @@ namespace Tso2MqoGui
         public void Write(XmlWriter writer)
         {
             writer.WriteStartElement("Bone");
-            writer.WriteAttributeString("id", (id+1).ToString());
+            writer.WriteAttributeString("id", id.ToString());
 
             writer.WriteAttributeString("rtX", q.X.ToString());
             writer.WriteAttributeString("rtY", q.Y.ToString());
@@ -63,13 +63,13 @@ namespace Tso2MqoGui
             writer.WriteAttributeString("name", name);
 
             writer.WriteStartElement("P");
-            writer.WriteAttributeString("id", (pid+1).ToString());
+            writer.WriteAttributeString("id", pid.ToString());
             writer.WriteEndElement();
 
             foreach (int cid in cids)
             {
                 writer.WriteStartElement("C");
-                writer.WriteAttributeString("id", (cid+1).ToString());
+                writer.WriteAttributeString("id", cid.ToString());
                 writer.WriteEndElement();
             }
             foreach (MqoWeit weit in weits)
