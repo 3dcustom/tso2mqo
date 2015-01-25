@@ -39,40 +39,47 @@ namespace Tso2MqoGui
             List<string> tokens = new List<string>();
             StringBuilder sb = new StringBuilder(s.Length);
             bool str = false;
-            bool escape = false;
-            bool bracket = false;
+            bool esc = false;
+            bool paren = false;
             s = s.Trim(' ', '\t', '\r', '\n');
 
             foreach (char i in s)
             {
-                if (escape)
+                if (esc)
                 {
                     sb.Append(i);
-                    escape = false;
+                    esc = false;
                     continue;
                 }
 
                 switch (i)
                 {
                     case '\\':
-                        if (str) sb.Append(i);
-                        else escape = true;
+                        if (str)
+                            sb.Append(i);
+                        else
+                            esc = true;
                         break;
                     case ' ':
                     case '\t':
-                        if (bracket) { sb.Append(i); }
-                        else if (str) { sb.Append(i); }
-                        else if (sb.Length > 0) { tokens.Add(sb.ToString()); sb.Length = 0; }
+                        if (paren)
+                            sb.Append(i);
+                        else if (str)
+                            sb.Append(i);
+                        else if (sb.Length > 0)
+                        {
+                            tokens.Add(sb.ToString()); sb.Length = 0;
+                        }
                         break;
                     case '(':
                         sb.Append(i);
                         if (!str)
-                            bracket = true;
+                            paren = true;
                         break;
                     case ')':
                         sb.Append(i);
                         if (!str)
-                            bracket = false;
+                            paren = false;
                         break;
                     case '\"':
                         sb.Append(i);
