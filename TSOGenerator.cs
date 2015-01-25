@@ -14,7 +14,7 @@ namespace Tso2MqoGui
     {
         private string dir;
         private TSOGeneratorConfig config;
-        protected MqoFile mqo;
+        protected MqoReader mqo;
         protected TSOFile tsoref;
         protected Dictionary<string, TSONode> nodes;
         protected List<TSOMesh> meshes;
@@ -45,7 +45,7 @@ namespace Tso2MqoGui
         private bool DoLoadMQO(string mqo_file)
         {
             // MQO読み込み
-            mqo = new MqoFile();
+            mqo = new MqoReader();
             mqo.Load(mqo_file);
             return true;
         }

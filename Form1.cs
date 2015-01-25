@@ -334,7 +334,7 @@ namespace Tso2MqoGui
                 SaveAssign();
 
                 // オブジェクト
-                MqoFile mqo = new MqoFile();
+                MqoReader mqo = new MqoReader();
                 mqo.Load(tbMqoFile.Text);
                 lvObjects.Items.Clear();
 

@@ -78,6 +78,7 @@
     <Compile Include="ImportInfo.cs" />
     <Compile Include="MqoFile.cs" />
     <Compile Include="MqoGenerator.cs" />
+    <Compile Include="MqoReader.cs" />
     <Compile Include="MqoWriter.cs" />
     <Compile Include="MqxWriter.cs" />
     <Compile Include="NvTriStrip.cs" />
