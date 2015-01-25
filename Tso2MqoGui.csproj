@@ -117,6 +117,8 @@
     <Compile Include="TSOFile.cs" />
     <Compile Include="TSOGeneratorConfig.cs" />
     <Compile Include="TSOGenerator.cs" />
+    <Compile Include="TSOGeneratorOneBone.cs" />
+    <Compile Include="TSOGeneratorRefBone.cs" />
     <Compile Include="TSOWriter.cs" />
     <Compile Include="VertexHeap.cs" />
   </ItemGroup>
