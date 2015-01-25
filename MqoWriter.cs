@@ -172,9 +172,41 @@ namespace Tso2MqoGui
 
             tw.WriteLine("}");
 
-            tso.UpdateNodesWorld();
+            MqoBone[] bones = null;
 
+            if (mqx_enabled)
+                bones = CreateBones(tso);
+
+            MqoObjectGen.uid_enabled = mqx_enabled;
+            MqoObjectGen obj = new MqoObjectGen();
+
+            ushort object_id = 0;
+            foreach (TSOMesh mesh in tso.meshes)
+            {
+                obj.id = ++object_id;
+                obj.name = mesh.Name;
+                obj.Update(mesh);
+                obj.Write(tw);
+
+                if (mqx_enabled)
+                    obj.AddWeits(bones);
+            }
+
+            if (mqx_enabled)
+            {
+                MqxWriter writer = new MqxWriter();
+                writer.MqoFile = OutFile;
+                writer.Write(bones, object_id /* eq numobjects */);
+            }
+
+            tw.WriteLine("Eof");
+        }
+
+        MqoBone[] CreateBones(TSOFile tso)
+        {
             MqoBone[] bones = new MqoBone[tso.nodes.Length];
+
+            tso.UpdateNodesWorld();
 
             foreach (TSONode node in tso.nodes)
             {
@@ -203,30 +235,9 @@ namespace Tso2MqoGui
 
                 bones[node.id] = bone;
             }
-
-            MqoObjectGen.uid_enabled = mqx_enabled;
-            MqoObjectGen obj = new MqoObjectGen();
-
-            ushort object_id = 0;
-            foreach (TSOMesh mesh in tso.meshes)
-            {
-                obj.id = ++object_id;
-                obj.name = mesh.Name;
-                obj.Update(mesh);
-                obj.Write(tw);
-                obj.AddWeits(bones);
-            }
-
-            if (mqx_enabled)
-            {
-                MqxWriter writer = new MqxWriter();
-                writer.MqoFile = OutFile;
-                writer.Write(bones, object_id /* eq numobjects */);
-            }
-
-            tw.WriteLine("Eof");
+            return bones;
         }
-
+#if false
         void WriteRokDeBone(MqoBone[] bones)
         {
             tw.WriteLine("Object \"{0}\" {{", "Bone");
@@ -260,6 +271,7 @@ namespace Tso2MqoGui
             tw.WriteLine("\t}");
             tw.WriteLine("}");
         }
+#endif
     }
 
     public class MqoObjectGen
