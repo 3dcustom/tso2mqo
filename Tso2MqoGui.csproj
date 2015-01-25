@@ -79,6 +79,7 @@
     <Compile Include="MqoFile.cs" />
     <Compile Include="MqoGenerator.cs" />
     <Compile Include="MqoWriter.cs" />
+    <Compile Include="MqxWriter.cs" />
     <Compile Include="NvTriStrip.cs" />
     <Compile Include="PointCluster.cs" />
     <Compile Include="Program.cs" />
