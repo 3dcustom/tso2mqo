@@ -7,8 +7,6 @@ namespace Tso2MqoGui
 {
     public class TSOGeneratorOneBone : TSOGenerator
     {
-        public Dictionary<string, string> ObjectBoneNames = new Dictionary<string, string>();
-
         public TSOGeneratorOneBone(TSOGeneratorConfig config)
             : base(config)
         {
@@ -114,6 +112,8 @@ namespace Tso2MqoGui
 
             return true;
         }
+
+        public Dictionary<string, string> ObjectBoneNames = new Dictionary<string, string>();
 
         // objに対応するボーンid配列を生成する。
         int[] CreateBones(MqoObject obj)

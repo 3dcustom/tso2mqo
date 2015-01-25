@@ -7,26 +7,31 @@ namespace Tso2MqoGui
 {
     public unsafe class TSOGeneratorRefBone : TSOGenerator
     {
-        private List<Vertex> vlst;
-        private PointCluster pc;
-
         public TSOGeneratorRefBone(TSOGeneratorConfig config)
             : base(config)
         {
         }
 
-        private void CreatePointCluster(TSOFile tso)
+        // 参照tso上の全頂点を保持する
+        List<Vertex> refverts;
+        // 最近傍探索
+        PointCluster pc;
+
+        void CreateRefVerts(TSOFile tso)
         {
-            vlst = new List<Vertex>();
+            refverts = new List<Vertex>();
 
             foreach (TSOMesh i in tso.meshes)
                 foreach (TSOSubMesh j in i.sub_meshes)
-                    vlst.AddRange(j.vertices);
+                    refverts.AddRange(j.vertices);
+        }
 
-            pc = new PointCluster(vlst.Count);
+        void CreatePointCluster()
+        {
+            pc = new PointCluster(refverts.Count);
 
-            foreach (Vertex i in vlst)
-                pc.Add(i.Pos.x, i.Pos.y, i.Pos.z);
+            foreach (Vertex i in refverts)
+                pc.Add(i.Pos);
 
             pc.Clustering();
         }
@@ -35,7 +40,8 @@ namespace Tso2MqoGui
         {
             tsoref = LoadTSO(path);
             tsoref.SwitchBoneIndicesOnMesh();
-            CreatePointCluster(tsoref);
+            CreateRefVerts(tsoref);
+            CreatePointCluster();
             return true;
         }
 
@@ -95,9 +101,9 @@ namespace Tso2MqoGui
                             continue;
                         }
 
-                        v[0] = vlst[vref[f.a]];
-                        v[1] = vlst[vref[f.b]];
-                        v[2] = vlst[vref[f.c]];
+                        v[0] = refverts[vref[f.a]];
+                        v[1] = refverts[vref[f.b]];
+                        v[2] = refverts[vref[f.c]];
 
                         work.Clear();
 
@@ -200,7 +206,7 @@ namespace Tso2MqoGui
         protected override bool DoCleanup()
         {
             pc = null;
-            vlst = null;
+            refverts = null;
             return base.DoCleanup();
         }
     }
