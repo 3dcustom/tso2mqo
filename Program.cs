@@ -46,7 +46,7 @@ namespace Tso2MqoGui
                     if (out_path != null)
                     {
                         MqoGenerator gen = new MqoGenerator();
-                        gen.Generate(tso_file, out_path, MqoBoneMode.None);
+                        gen.Generate(tso_file, out_path, false);
                     }
                     else
                     {

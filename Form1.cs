@@ -174,7 +174,7 @@ namespace Tso2MqoGui
                 label2.Update();
 
                 MqoGenerator gen = new MqoGenerator();
-                gen.Generate(tso_file, out_path, rbBoneRokDeBone.Checked ? MqoBoneMode.RokDeBone : MqoBoneMode.None);
+                gen.Generate(tso_file, out_path, rbBoneRokDeBone.Checked);
 
                 if (cbCopyTSO.Checked)
                 {

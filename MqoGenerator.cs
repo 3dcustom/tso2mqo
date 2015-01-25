@@ -14,7 +14,7 @@ namespace Tso2MqoGui
             return tso;
         }
 
-        public void Generate(string tso_file, string out_path, MqoBoneMode bone_mode)
+        public void Generate(string tso_file, string out_path, bool mqx_enabled)
         {
             string tso_filename = Path.GetFileName(tso_file);
             string mqo_file = Path.Combine(out_path, Path.ChangeExtension(tso_filename, ".mqo"));
@@ -26,7 +26,7 @@ namespace Tso2MqoGui
                 TSOFile tso = LoadTSO(tso_file);
                 tso.SwitchBoneIndicesOnMesh();
 
-                mqo.BoneMode = bone_mode;
+                mqo.MqxEnabled = mqx_enabled;
 
                 mqo.Write(tso);
                 mqo.Close();

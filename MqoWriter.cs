@@ -6,13 +6,6 @@ using System.Xml;
 
 namespace Tso2MqoGui
 {
-    public enum MqoBoneMode
-    {
-        None,
-        RokDeBone,
-        Mikoto,
-    }
-
     public class Pair<T, U>
     {
         public T First;
@@ -34,7 +27,7 @@ namespace Tso2MqoGui
         public TextWriter tw;
         public string OutPath;
         public string OutFile;
-        public MqoBoneMode BoneMode = MqoBoneMode.None;
+        public bool MqxEnabled;
 
         public MqoWriter(string file)
         {
@@ -127,13 +120,10 @@ namespace Tso2MqoGui
 
         public void Write(TSOFile tso)
         {
-            // ボーンを出す
-            bool mqx_enabled = BoneMode == MqoBoneMode.RokDeBone;
-
             tw.WriteLine("Metasequoia Document");
             tw.WriteLine("Format Text Ver 1.0");
             tw.WriteLine("");
-            if (mqx_enabled)
+            if (MqxEnabled)
             {
                 tw.WriteLine("IncludeXml \"{0}\"", Path.GetFileName(Path.ChangeExtension(OutFile, ".mqx")));
                 tw.WriteLine("");
@@ -174,10 +164,10 @@ namespace Tso2MqoGui
 
             MqoBone[] bones = null;
 
-            if (mqx_enabled)
+            if (MqxEnabled)
                 bones = CreateBones(tso);
 
-            MqoObjectGen.uid_enabled = mqx_enabled;
+            MqoObjectGen.uid_enabled = MqxEnabled;
             MqoObjectGen obj = new MqoObjectGen();
 
             ushort object_id = 0;
@@ -188,11 +178,11 @@ namespace Tso2MqoGui
                 obj.Update(mesh);
                 obj.Write(tw);
 
-                if (mqx_enabled)
+                if (MqxEnabled)
                     obj.AddWeits(bones);
             }
 
-            if (mqx_enabled)
+            if (MqxEnabled)
             {
                 MqxWriter writer = new MqxWriter();
                 writer.MqoFile = OutFile;
@@ -237,41 +227,6 @@ namespace Tso2MqoGui
             }
             return bones;
         }
-#if false
-        void WriteRokDeBone(MqoBone[] bones)
-        {
-            tw.WriteLine("Object \"{0}\" {{", "Bone");
-            tw.WriteLine("\tvisible {0}", 15);
-            tw.WriteLine("\tlocking {0}", 0);
-            tw.WriteLine("\tshading {0}", 1);
-            tw.WriteLine("\tfacet {0}", 59.5);
-            tw.WriteLine("\tcolor {0} {1} {2}", 1, 0, 0);
-            tw.WriteLine("\tcolor_type {0}", 0);
-
-            tw.WriteLine("\tvertex {0} {{", bones.Length);
-
-            foreach (MqoBone bone in bones)
-                tw.WriteLine("\t\t{0:F4} {1:F4} {2:F4}", bone.q.x, bone.q.y, bone.q.z);
-
-            tw.WriteLine("\t}");
-
-            //
-            tw.WriteLine("\tface {0} {{", bones.Length);
-
-            foreach (MqoBone bone in bones)
-            {
-                if (bone.pid == -1)
-                    continue;
-
-                //根元と先端を接続するedge
-                if (! bone.tail)
-                    tw.WriteLine(string.Format("\t\t2 V({0} {1})", bone.pid, bone.id));
-            }
-
-            tw.WriteLine("\t}");
-            tw.WriteLine("}");
-        }
-#endif
     }
 
     public class MqoObjectGen
