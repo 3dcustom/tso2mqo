@@ -31,10 +31,9 @@ namespace Tso2MqoGui
             pc.Clustering();
         }
 
-        protected override bool DoLoadRefTSO(string tsoref_file)
+        protected override bool DoLoadRefTSO(string path)
         {
-            // 参照TSOロード
-            tsoref = LoadTSO(tsoref_file);
+            tsoref = LoadTSO(path);
             tsoref.SwitchBoneIndicesOnMesh();
             CreatePointCluster(tsoref);
             return true;

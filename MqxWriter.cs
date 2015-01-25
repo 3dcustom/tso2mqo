@@ -6,10 +6,22 @@ using System.Xml;
 
 namespace Tso2MqoGui
 {
+    /// MqxFileを書き出します。
     public class MqxWriter
     {
+        // mqo path
+        //todo: rename to MqoPath
         public string MqoFile;
 
+        // MqxFileを書き出す。
+        //
+        // bones:
+        // ボーン配列
+        // numobjects:
+        // オブジェクトの総数
+        // スキン設定の対象オブジェクトは全てのオブジェクトとする。
+        //
+        // todo: oids
         public void Write(MqoBone[] bones, int numobjects)
         {
             XmlWriterSettings settings = new XmlWriterSettings();

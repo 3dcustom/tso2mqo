@@ -5,23 +5,22 @@ using System.IO;
 using System.Text;
 using System.Runtime.InteropServices;
 using System.ComponentModel;
-using System.Windows.Forms;
 using System.Windows.Forms.Design;
 
 namespace Tso2MqoGui
 {
     public abstract class TSOGenerator
     {
-        private string dir;
-        private TSOGeneratorConfig config;
+        string dir;
+        TSOGeneratorConfig config;
         protected MqoReader mqo;
         protected TSOFile tsoref;
-        protected Dictionary<string, TSONode> nodes;
         protected List<TSOMesh> meshes;
-        private ImportInfo ii;
-        private BinaryWriter bw;
-        protected Dictionary<string, MaterialInfo> materials;
-        private Dictionary<string, TextureInfo> textures;
+        ImportInfo ii;
+        BinaryWriter bw;
+        Dictionary<string, MaterialInfo> materials;
+        protected int nummaterials { get { return materials.Count; } }
+        Dictionary<string, TextureInfo> textures;
 
         public TSOGenerator(TSOGeneratorConfig config)
         {
@@ -35,14 +34,14 @@ namespace Tso2MqoGui
             return tso;
         }
 
-        private bool SetCurrentDirectory(string dir)
+        bool SetCurrentDirectory(string dir)
         {
             this.dir = dir;
             Environment.CurrentDirectory = dir;
             return true;
         }
 
-        private bool DoLoadMQO(string mqo_file)
+        bool DoLoadMQO(string mqo_file)
         {
             // MQO読み込み
             mqo = new MqoReader();
@@ -50,7 +49,7 @@ namespace Tso2MqoGui
             return true;
         }
 
-        private bool DoLoadXml(string importinfo_file)
+        bool DoLoadXml(string importinfo_file)
         {
             // XML読み込み
             ii = ImportInfo.Load(importinfo_file);
@@ -97,28 +96,25 @@ namespace Tso2MqoGui
             return true;
         }
 
-        private bool DoWriteHeader()
+        bool DoWriteHeader()
         {
             bw.Write(0x314F5354);
             return true;
         }
 
-        private bool DoWriteNodeNames()
+        bool DoWriteNodeNames()
         {
             bw.Write(tsoref.nodes.Length);
-
-            nodes = new Dictionary<string, TSONode>();
 
             foreach (TSONode i in tsoref.nodes)
             {
                 WriteString(bw, i.Name);
-                nodes.Add(i.ShortName, i);
             }
 
             return true;
         }
 
-        private bool DoWriteNodeMatrices()
+        bool DoWriteNodeMatrices()
         {
             bw.Write(tsoref.nodes.Length);
 
@@ -128,7 +124,7 @@ namespace Tso2MqoGui
             return true;
         }
 
-        private bool DoWriteTextures()
+        bool DoWriteTextures()
         {
             bw.Write(textures.Count);
 
@@ -165,7 +161,7 @@ namespace Tso2MqoGui
             return true;
         }
 
-        private bool DoWriteEffects()
+        bool DoWriteEffects()
         {
             bw.Write(ii.effects.Count);
 
@@ -184,7 +180,7 @@ namespace Tso2MqoGui
             return true;
         }
 
-        private bool DoWriteMaterials()
+        bool DoWriteMaterials()
         {
             bw.Write(mqo.Materials.Count);
 
@@ -212,7 +208,7 @@ namespace Tso2MqoGui
             return true;
         }
 
-        private bool DoWriteMeshes()
+        bool DoWriteMeshes()
         {
             bw.Write(meshes.Count);
 
@@ -241,13 +237,13 @@ namespace Tso2MqoGui
             return true;
         }
 
-        private bool DoOutput(string tsoout_file)
+        bool DoOutput(string path)
         {
             //----- 出力処理 -----------------------------------------------
             ii.materials.Clear();
             ii.textures.Clear();
 
-            using (FileStream fs = File.OpenWrite(tsoout_file))
+            using (FileStream fs = File.OpenWrite(path))
             {
                 fs.SetLength(0);
                 bw = new BinaryWriter(fs);
@@ -264,9 +260,12 @@ namespace Tso2MqoGui
 
             return true;
         }
+
+        //メッシュリストを生成する。
+        //メッシュリストはthis.meshesに保持する。
         protected abstract bool DoGenerateMeshes();
 
-        private bool DoSaveXml(string importinfo_file)
+        bool DoSaveXml(string importinfo_file)
         {
             // 結果を保存しておく
             ImportInfo.Save(importinfo_file, ii);
@@ -277,7 +276,6 @@ namespace Tso2MqoGui
         {
             dir = null;
             tsoref = null;
-            nodes = null;
             meshes = null;
             mqo = null;
             ii = null;
@@ -309,7 +307,9 @@ namespace Tso2MqoGui
             }
         }
 
-        protected abstract bool DoLoadRefTSO(string tsoref);
+        // 参照tsoを読み込む。
+        // 参照tsoはthis.tsorefに保持する。
+        protected abstract bool DoLoadRefTSO(string path);
 
         #region ユーティリティ
         public void WriteString(BinaryWriter bw, string s)

@@ -14,10 +14,24 @@ namespace Tso2MqoGui
         {
         }
 
-        protected override bool DoLoadRefTSO(string tsoref_file)
+        //ボーンの名称からidを得る辞書
+        protected Dictionary<string, int> node_idmap;
+
+        //ボーンの名称からidを得る辞書を生成する。参照tsoを基にする。
+        void CreateNodeMap()
         {
-            // 参照TSOロード
-            tsoref = LoadTSO(tsoref_file);
+            node_idmap = new Dictionary<string, int>();
+
+            foreach (TSONode i in tsoref.nodes)
+            {
+                node_idmap.Add(i.ShortName, i.ID);
+            }
+        }
+
+        protected override bool DoLoadRefTSO(string path)
+        {
+            tsoref = LoadTSO(path);
+            CreateNodeMap();
             return true;
         }
 
@@ -37,17 +51,7 @@ namespace Tso2MqoGui
                 // ボーン情報作成
                 uint idx = 0x00000000;
                 Point4 wgt = new Point4(1, 0, 0, 0);
-                int[] bones = new int[1];
-                string bone;
-                try
-                {
-                    bone = ObjectBoneNames[obj.name];
-                }
-                catch (KeyNotFoundException)
-                {
-                    throw new KeyNotFoundException(string.Format("ボーン指定に誤りがあります。オブジェクト {0} にボーンを割り当てる必要があります。", obj.name));
-                }
-                bones[0] = nodes[bone].ID;
+                int[] bones = CreateBones(obj);
 
                 // マテリアル別に処理を実行
                 List<ushort> indices = new List<ushort>();
@@ -57,7 +61,7 @@ namespace Tso2MqoGui
                 Console.WriteLine("  vertices bone_indices");
                 Console.WriteLine("  -------- ------------");
 
-                for (int mtl = 0; mtl < materials.Count; ++mtl)
+                for (int mtl = 0; mtl < nummaterials; ++mtl)
                 {
                     indices.Clear();
 
@@ -109,6 +113,23 @@ namespace Tso2MqoGui
             }
 
             return true;
+        }
+
+        // objに対応するボーンid配列を生成する。
+        int[] CreateBones(MqoObject obj)
+        {
+            int[] bones = new int[1];
+            string name;
+            try
+            {
+                name = ObjectBoneNames[obj.name];
+            }
+            catch (KeyNotFoundException)
+            {
+                throw new KeyNotFoundException(string.Format("ボーン指定に誤りがあります。オブジェクト {0} にボーンを割り当てる必要があります。", obj.name));
+            }
+            bones[0] = node_idmap[name];
+            return bones;
         }
     }
 }
