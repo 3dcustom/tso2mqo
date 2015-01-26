@@ -200,7 +200,7 @@ namespace Tso2MqoGui
 
             if (rbRefBone.Checked)
             {
-                TSOGeneratorRefBone gen = new TSOGeneratorRefBone(config);
+                TSOGeneratorMqxBone gen = new TSOGeneratorMqxBone(config);
                 gen.Generate(file, tbTsoFileRef.Text, tbTsoFile.Text);
             }
             else if (rbOneBone.Checked)

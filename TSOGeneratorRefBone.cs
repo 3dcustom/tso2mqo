@@ -148,7 +148,6 @@ namespace Tso2MqoGui
                                 idx[l] = (byte)bh[idx[l]];
                             }
 
-                            //refvs[k]は値型なのでrefvertsに影響しない。
                             refvs[k].Idx = idx0;
                         }
 

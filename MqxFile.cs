@@ -127,7 +127,7 @@ namespace Tso2MqoGui
     {
         public int object_id;
         public int vertex_id;
-        //public int bone_id;
+        public int bone_id;
         public float weit;
 
         public void Write(XmlWriter writer)
