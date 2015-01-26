@@ -117,22 +117,44 @@ namespace Tso2MqoGui
 
         bool DoWriteNodeNames()
         {
-            bw.Write(tsoref.nodes.Length);
-
-            foreach (TSONode i in tsoref.nodes)
+            if (tsoref != null)
             {
-                WriteString(bw, i.Name);
+                bw.Write(tsoref.nodes.Length);
+
+                foreach (TSONode i in tsoref.nodes)
+                    WriteString(bw, i.Name);
             }
+            else if (mqx != null)
+            {
+                bw.Write(mqx.bones.Length);
+
+                foreach (MqoBone i in mqx.bones)
+                    WriteString(bw, i.path);
+            }
+            else
+                return false;
 
             return true;
         }
 
         bool DoWriteNodeMatrices()
         {
-            bw.Write(tsoref.nodes.Length);
+            if (tsoref != null)
+            {
+                bw.Write(tsoref.nodes.Length);
 
-            foreach (TSONode i in tsoref.nodes)
-                WriteMatrix(bw, i.Matrix);
+                foreach (TSONode i in tsoref.nodes)
+                    WriteMatrix(bw, i.Matrix);
+            }
+            else if (mqx != null)
+            {
+                bw.Write(mqx.bones.Length);
+
+                foreach (MqoBone i in mqx.bones)
+                    WriteMatrix(bw, i.matrix);
+            }
+            else
+                return false;
 
             return true;
         }

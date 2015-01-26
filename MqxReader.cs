@@ -21,6 +21,8 @@ namespace Tso2MqoGui
         // ボーン配列 [out]
         public MqoBone[] bones;
 
+        Dictionary<int, MqoBone> bone_idmap;
+
         //頂点ウェイト配列 [out]
         public MqoWeit[] weits;
 
@@ -73,6 +75,40 @@ namespace Tso2MqoGui
             }
             reader.ReadEndElement();//BoneSet
 
+            len = i;
+            Array.Resize(ref bones, len);
+
+            // create bone_idmap
+            bone_idmap = new Dictionary<int, MqoBone>(len);
+            foreach (MqoBone bone in bones)
+            {
+                bone_idmap[bone.id] = bone;
+            }
+
+            // assign node.path
+            foreach (MqoBone bone in bones)
+            {
+                if (bone.pid != 0)
+                {
+                    MqoBone parent = bone_idmap[bone.pid];
+                    bone.path = parent.path + "|" + bone.name;
+                }
+                else
+                    bone.path = "|" + bone.name;
+            }
+
+            // assign node.local_position
+            foreach (MqoBone bone in bones)
+            {
+                if (bone.pid != 0)
+                {
+                    MqoBone parent = bone_idmap[bone.pid];
+                    bone.local_position = bone.world_position - parent.world_position;
+                }
+                else
+                    bone.local_position = bone.world_position;
+            }
+
             while (reader.IsStartElement("Obj"))
             {
                 //Console.WriteLine("Obj");
@@ -112,9 +148,6 @@ namespace Tso2MqoGui
             }
             foreach (MqoBone bone in bones)
             {
-                if (bone == null)
-                    continue;
-
                 foreach (MqoWeit weit in bone.weits)
                 {
                     Dictionary<int, List<MqoWeit>> map = weitmap[weit.object_id];

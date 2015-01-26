@@ -10,6 +10,7 @@ namespace Tso2MqoGui
     {
         public int id;
         public string name;
+        public string path;
         public bool tail;
         //親id
         //なければ0
@@ -24,6 +25,20 @@ namespace Tso2MqoGui
         public Point3 p;
 
         public List<MqoWeit> weits;
+
+        public Point3 world_position;
+        public Point3 local_position;
+        public Matrix44 matrix
+        {
+            get
+            {
+                Matrix44 m = Matrix44.Identity;
+                m.m41 = local_position.x;
+                m.m42 = local_position.y;
+                m.m43 = local_position.z;
+                return m;
+            }
+        }
 
         public MqoBone()
         {
@@ -86,6 +101,11 @@ namespace Tso2MqoGui
         {
             this.id = int.Parse(reader.GetAttribute("id"));
             this.name = reader.GetAttribute("name");
+
+            float rtX = float.Parse(reader.GetAttribute("rtX"));
+            float rtY = float.Parse(reader.GetAttribute("rtY"));
+            float rtZ = float.Parse(reader.GetAttribute("rtZ"));
+            this.world_position = new Point3(rtX, rtY, rtZ);
 
             reader.Read();//Bone
 

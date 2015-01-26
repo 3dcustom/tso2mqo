@@ -14,8 +14,6 @@ namespace Tso2MqoGui
 
         protected override bool DoLoadRefTSO(string path)
         {
-            tsoref = LoadTSO(path);
-
             return true;
         }
 
