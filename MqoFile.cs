@@ -98,13 +98,12 @@ namespace Tso2MqoGui
         {
             int cmp;
             cmp = Pos.CompareTo(o.Pos); if (cmp != 0) return cmp;
-            cmp = Nrm.CompareTo(o.Nrm);
             return cmp;
         }
 
         public override int GetHashCode()
         {
-            return Pos.GetHashCode() ^ Nrm.GetHashCode();
+            return Pos.GetHashCode();
         }
 
         public override bool Equals(object obj)
@@ -112,7 +111,7 @@ namespace Tso2MqoGui
             if (obj is UVertex)
             {
                 UVertex o = (UVertex)obj;
-                return Pos.Equals(o.Pos) && Nrm.Equals(o.Nrm);
+                return Pos.Equals(o.Pos);
             }
             return false;
         }
@@ -124,7 +123,7 @@ namespace Tso2MqoGui
                 return false;
             }
 
-            return Pos.Equals(o.Pos) && Nrm.Equals(o.Nrm);
+            return Pos.Equals(o.Pos);
         }
 
         public void Write(TextWriter tw)
