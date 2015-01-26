@@ -12,34 +12,11 @@ namespace Tso2MqoGui
         {
         }
 
-        MqoWeit[] weits;
-
-        void CreateWeits()
-        {
-            weits = new MqoWeit[4];
-            for (int i = 0; i < 4; ++i)
-            {
-                weits[i] = new MqoWeit();
-            }
-        }
-
         protected override bool DoLoadRefTSO(string path)
         {
             tsoref = LoadTSO(path);
-            CreateWeits();
+
             return true;
-        }
-
-        void UpdateWeits(int object_id, int vertex_id)
-        {
-            //todo
-
-            for (int i = 0; i < 4; ++i)
-            {
-                weits[i].bone_id = 1;
-                weits[i].weit = 0.0f;
-            }
-            weits[0].weit = 1.0f;
         }
 
         protected override bool DoGenerateMeshes()
@@ -105,12 +82,11 @@ namespace Tso2MqoGui
                             float* wgt = (float*)(&wgt0);
 
                             int vertex_id = obj.vertices[face.vert_indices[k]].id;
-                            UpdateWeits(object_id, vertex_id);
-
+                            mqx.UpdateWeits(object_id, vertex_id);
                             for (int l = 0; l < 4; ++l)
                             {
-                                idx[l] = (byte)(weits[l].bone_id-1);
-                                wgt[l] = weits[l].weit;
+                                idx[l] = (byte)(mqx.weits[l].bone_id-1);
+                                wgt[l] = mqx.weits[l].weit;
                             }
                             refvs[k].Idx = idx0;
                             refvs[k].Wgt = wgt0;

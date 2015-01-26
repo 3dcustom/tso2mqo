@@ -14,8 +14,7 @@ namespace Tso2MqoGui
             string mqo_file = args[0];
 
             MqxReader reader = new MqxReader();
-            reader.MqoFile = mqo_file;
-            reader.Read();
+            reader.Load(mqo_file);
         }
     }
 }

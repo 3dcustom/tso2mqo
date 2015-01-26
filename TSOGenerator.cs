@@ -14,6 +14,7 @@ namespace Tso2MqoGui
         string dir;
         TSOGeneratorConfig config;
         protected MqoReader mqo;
+        protected MqxReader mqx;
         protected TSOFile tsoref;
         protected List<TSOMesh> meshes;
         ImportInfo ii;
@@ -46,6 +47,18 @@ namespace Tso2MqoGui
             // MQO読み込み
             mqo = new MqoReader();
             mqo.Load(mqo_file);
+            return true;
+        }
+
+        bool DoLoadMqx(string mqo_file)
+        {
+            // Mqx読み込み
+            mqx = new MqxReader();
+            if (mqx.Load(mqo_file))
+            {
+                mqx.CreateWeits();
+                mqx.CreateWeitMap();
+            }
             return true;
         }
 
@@ -296,6 +309,7 @@ namespace Tso2MqoGui
             {
                 if (!SetCurrentDirectory(dir)) return;
                 if (!DoLoadMQO(mqo_file)) return;
+                if (!DoLoadMqx(mqo_file)) return;
                 if (!DoLoadRefTSO(tsoref_file)) return;
                 if (!DoLoadXml(importinfo_file)) return;
                 if (!DoOutput(tsoout_file)) return;

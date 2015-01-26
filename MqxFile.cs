@@ -84,30 +84,21 @@ namespace Tso2MqoGui
 
         public void Read(XmlReader reader)
         {
-            Console.WriteLine("Bone");
-
             this.id = int.Parse(reader.GetAttribute("id"));
             this.name = reader.GetAttribute("name");
-
-            Console.WriteLine("  id:{0}", this.id);
-            Console.WriteLine("  name:{0}", this.name);
 
             reader.Read();//Bone
 
             if (reader.IsStartElement("P"))
             {
-                Console.WriteLine("P");
                 int id = int.Parse(reader.GetAttribute("id"));
-                Console.WriteLine("  id:{0}", id);
                 reader.Read();//P
                 this.pid = id;
             }
 
             while (reader.IsStartElement("C"))
             {
-                Console.WriteLine("C");
                 int id = int.Parse(reader.GetAttribute("id"));
-                Console.WriteLine("  id:{0}", reader.GetAttribute("id"));
                 reader.Read();//C
                 this.cids.Add(id);
             }
@@ -120,6 +111,23 @@ namespace Tso2MqoGui
             }
 
             reader.ReadEndElement();//Bone
+        }
+
+        public void Dump()
+        {
+            Console.WriteLine("Bone");
+
+            Console.WriteLine("  id:{0}", this.id);
+            Console.WriteLine("  name:{0}", this.name);
+
+            Console.WriteLine("P");
+            Console.WriteLine("  id:{0}", pid);
+
+            foreach (int cid in cids)
+            {
+                Console.WriteLine("C");
+                Console.WriteLine("  id:{0}", cid);
+            }
         }
     }
 
@@ -143,17 +151,20 @@ namespace Tso2MqoGui
 
         public void Read(XmlReader reader)
         {
-            Console.WriteLine("W");
-
             this.object_id = int.Parse(reader.GetAttribute("oi"));
             this.vertex_id = int.Parse(reader.GetAttribute("vi"));
-            this.weit = float.Parse(reader.GetAttribute("w"));
+            this.weit = float.Parse(reader.GetAttribute("w")) * 0.01f;
+
+            reader.Read();//W
+        }
+
+        public void Dump()
+        {
+            Console.WriteLine("W");
 
             Console.WriteLine("  oi:{0}", this.object_id);
             Console.WriteLine("  vi:{0}", this.vertex_id);
             Console.WriteLine("  w:{0}", this.weit);
-
-            reader.Read();//W
         }
     }
 }
