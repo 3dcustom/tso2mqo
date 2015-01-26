@@ -68,7 +68,7 @@ namespace Tso2MqoGui
                 List<int> faces_2 = new List<int>();
                 Heap<int> bh = new Heap<int>();
                 Heap<Vertex> vh = new Heap<Vertex>();
-                Vertex[] v = new Vertex[3];
+                Vertex[] refvs = new Vertex[3];
                 List<ushort> vert_indices = new List<ushort>();
                 Dictionary<int, bool> adding_bone_indices = new Dictionary<int, bool>();
                 List<TSOSubMesh> subs = new List<TSOSubMesh>();
@@ -97,16 +97,16 @@ namespace Tso2MqoGui
                             continue;
                         }
 
-                        v[0] = refverts[vref[face.a]];
-                        v[1] = refverts[vref[face.b]];
-                        v[2] = refverts[vref[face.c]];
+                        refvs[0] = refverts[vref[face.a]];
+                        refvs[1] = refverts[vref[face.b]];
+                        refvs[2] = refverts[vref[face.c]];
 
                         adding_bone_indices.Clear();
 
                         for (int k = 0; k < 3; ++k)
                         {
-                            UInt32 idx0 = v[k].Idx;
-                            Point4 wgt0 = v[k].Wgt;
+                            UInt32 idx0 = refvs[k].Idx;
+                            Point4 wgt0 = refvs[k].Wgt;
                             byte* idx = (byte*)(&idx0);
                             float* wgt = (float*)(&wgt0);
 
@@ -134,8 +134,8 @@ namespace Tso2MqoGui
 
                         for (int k = 0; k < 3; ++k)
                         {
-                            UInt32 idx0 = v[k].Idx;
-                            Point4 wgt0 = v[k].Wgt;
+                            UInt32 idx0 = refvs[k].Idx;
+                            Point4 wgt0 = refvs[k].Wgt;
                             byte* idx = (byte*)(&idx0);
                             float* wgt = (float*)(&wgt0);
 
@@ -147,13 +147,13 @@ namespace Tso2MqoGui
                                 idx[l] = (byte)bh[idx[l]];
                             }
 
-                            //v[k]は値型なのでrefvertsに影響しない。
-                            v[k].Idx = idx0;
+                            //refvs[k]は値型なのでrefvertsに影響しない。
+                            refvs[k].Idx = idx0;
                         }
 
-                        Vertex va = new Vertex(obj.vertices[face.a].Pos, v[0].Wgt, v[0].Idx, obj.vertices[face.a].Nrm, new Point2(face.ta.x, 1 - face.ta.y));
-                        Vertex vb = new Vertex(obj.vertices[face.b].Pos, v[1].Wgt, v[1].Idx, obj.vertices[face.b].Nrm, new Point2(face.tb.x, 1 - face.tb.y));
-                        Vertex vc = new Vertex(obj.vertices[face.c].Pos, v[2].Wgt, v[2].Idx, obj.vertices[face.c].Nrm, new Point2(face.tc.x, 1 - face.tc.y));
+                        Vertex va = new Vertex(obj.vertices[face.a].Pos, refvs[0].Wgt, refvs[0].Idx, obj.vertices[face.a].Nrm, new Point2(face.ta.x, 1 - face.ta.y));
+                        Vertex vb = new Vertex(obj.vertices[face.b].Pos, refvs[1].Wgt, refvs[1].Idx, obj.vertices[face.b].Nrm, new Point2(face.tb.x, 1 - face.tb.y));
+                        Vertex vc = new Vertex(obj.vertices[face.c].Pos, refvs[2].Wgt, refvs[2].Idx, obj.vertices[face.c].Nrm, new Point2(face.tc.x, 1 - face.tc.y));
 
                         vert_indices.Add(vh.Add(va));
                         vert_indices.Add(vh.Add(vc));
