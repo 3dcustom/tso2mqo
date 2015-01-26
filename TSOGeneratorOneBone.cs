@@ -52,7 +52,7 @@ namespace Tso2MqoGui
                 int[] bones = CreateBones(obj);
 
                 // マテリアル別に処理を実行
-                List<ushort> indices = new List<ushort>();
+                List<ushort> vert_indices = new List<ushort>();
                 VertexHeap<Vertex> vh = new VertexHeap<Vertex>();
                 List<TSOSubMesh> subs = new List<TSOSubMesh>();
 
@@ -61,7 +61,7 @@ namespace Tso2MqoGui
 
                 for (int mtl = 0; mtl < nummaterials; ++mtl)
                 {
-                    indices.Clear();
+                    vert_indices.Clear();
 
                     foreach (MqoFace face in obj.faces)
                     {
@@ -72,28 +72,28 @@ namespace Tso2MqoGui
                         Vertex vb = new Vertex(obj.vertices[face.b].Pos, wgt, idx, obj.vertices[face.b].Nrm, new Point2(face.tb.x, 1 - face.tb.y));
                         Vertex vc = new Vertex(obj.vertices[face.c].Pos, wgt, idx, obj.vertices[face.c].Nrm, new Point2(face.tc.x, 1 - face.tc.y));
 
-                        indices.Add(vh.Add(va));
-                        indices.Add(vh.Add(vc));
-                        indices.Add(vh.Add(vb));
+                        vert_indices.Add(vh.Add(va));
+                        vert_indices.Add(vh.Add(vc));
+                        vert_indices.Add(vh.Add(vb));
                     }
 
-                    if (indices.Count == 0)
+                    if (vert_indices.Count == 0)
                         continue;
 
-                    // フェイス最適化
-                    ushort[] nidx = NvTriStrip.Optimize(indices.ToArray());
+                    ushort[] optimized_indices = NvTriStrip.Optimize(vert_indices.ToArray());
 
-                    // サブメッシュ生成
-                    Vertex[] verts = vh.verts.ToArray();
                     TSOSubMesh sub = new TSOSubMesh();
                     sub.spec = mtl;
                     sub.numbones = bones.Length;
                     sub.bones = bones;
-                    sub.numvertices = nidx.Length;
-                    sub.vertices = new Vertex[nidx.Length];
 
-                    for (int i = 0; i < nidx.Length; ++i)
-                        sub.vertices[i] = verts[nidx[i]];
+                    sub.numvertices = optimized_indices.Length;
+                    Vertex[] vertices = new Vertex[optimized_indices.Length];
+                    for (int i = 0; i < optimized_indices.Length; ++i)
+                    {
+                        vertices[i] = vh.verts[optimized_indices[i]];
+                    }
+                    sub.vertices = vertices;
 
                     Console.WriteLine("  {0,8} {1,12}", sub.vertices.Length, sub.bones.Length);
 

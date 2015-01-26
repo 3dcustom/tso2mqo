@@ -59,138 +59,131 @@ namespace Tso2MqoGui
                 // 一番近い頂点への参照
                 List<int> vref = new List<int>(obj.vertices.Count);
 
-                foreach (UVertex j in obj.vertices)
-                    vref.Add(pc.NearestIndex(j.Pos.x, j.Pos.y, j.Pos.z));
+                foreach (UVertex i in obj.vertices)
+                    vref.Add(pc.NearestIndex(i.Pos.x, i.Pos.y, i.Pos.z));
 
                 obj.CreateNormal();
 
-                // フェイスの組成
-                List<int> faces1 = new List<int>();
-                List<int> faces2 = new List<int>();
-                //int[]                   bonecnv = new int[tsor.nodes.Length];   // ボーン変換テーブル
+                List<int> faces_1 = new List<int>();
+                List<int> faces_2 = new List<int>();
                 VertexHeap<Vertex> vh = new VertexHeap<Vertex>();
                 Vertex[] v = new Vertex[3];
-                List<int> bones = new List<int>(16);
-                List<ushort> indices = new List<ushort>();
-                Dictionary<int, int> selected = new Dictionary<int, int>();
-                Dictionary<int, int> work = new Dictionary<int, int>();
+                List<int> bone_indices = new List<int>(16);
+                List<ushort> vert_indices = new List<ushort>();
+                Dictionary<int, int> bone_indices_map = new Dictionary<int, int>();
+                Dictionary<int, bool> adding_bone_indices = new Dictionary<int, bool>();
                 List<TSOSubMesh> subs = new List<TSOSubMesh>();
 
-                for (int j = 0, n = obj.faces.Count; j < n; ++j)
-                    faces1.Add(j);
+                for (int i = 0, n = obj.faces.Count; i < n; ++i)
+                    faces_1.Add(i);
 
                 #region ボーンパーティション
                 Console.WriteLine("  vertices bone_indices");
                 Console.WriteLine("  -------- ------------");
 
-                while (faces1.Count > 0)
+                while (faces_1.Count != 0)
                 {
-                    int mtl = obj.faces[faces1[0]].mtl;
-                    selected.Clear();
-                    indices.Clear();
+                    int mtl = obj.faces[faces_1[0]].mtl;
+                    bone_indices_map.Clear();
+                    vert_indices.Clear();
                     vh.Clear();
-                    bones.Clear();
+                    bone_indices.Clear();
 
-                    foreach (int j in faces1)
+                    foreach (int f in faces_1)
                     {
-                        MqoFace f = obj.faces[j];
+                        MqoFace face = obj.faces[f];
 
-                        if (f.mtl != mtl)
+                        if (face.mtl != mtl)
                         {
-                            faces2.Add(j);
+                            faces_2.Add(f);
                             continue;
                         }
 
-                        v[0] = refverts[vref[f.a]];
-                        v[1] = refverts[vref[f.b]];
-                        v[2] = refverts[vref[f.c]];
+                        v[0] = refverts[vref[face.a]];
+                        v[1] = refverts[vref[face.b]];
+                        v[2] = refverts[vref[face.c]];
 
-                        work.Clear();
+                        adding_bone_indices.Clear();
 
                         for (int k = 0; k < 3; ++k)
                         {
-                            Vertex vv = v[k];
-                            UInt32 idx0 = vv.Idx;
-                            Point4 wgt0 = vv.Wgt;
+                            UInt32 idx0 = v[k].Idx;
+                            Point4 wgt0 = v[k].Wgt;
                             byte* idx = (byte*)(&idx0);
                             float* wgt = (float*)(&wgt0);
 
                             for (int l = 0; l < 4; ++l)
                             {
-                                if (wgt[l] <= float.Epsilon) continue;
-                                if (selected.ContainsKey(idx[l])) continue;
+                                if (wgt[l] <= float.Epsilon)
+                                    continue;
+                                if (bone_indices_map.ContainsKey(idx[l]))
+                                    continue;
 
-                                if (!work.ContainsKey(idx[l]))
-                                    work.Add(idx[l], 0);
+                                adding_bone_indices[idx[l]] = true;
                             }
                         }
 
-                        if (selected.Count + work.Count > 16)
+                        if (bone_indices_map.Count + adding_bone_indices.Count > 16)
                         {
-                            faces2.Add(j);
+                            faces_2.Add(f);
                             continue;
                         }
 
-                        // ボーンリストに足してvalid
-                        foreach (KeyValuePair<int, int> l in work)
+                        foreach (int i in adding_bone_indices.Keys)
                         {
-                            selected.Add(l.Key, selected.Count);    // ボーンテーブルに追加
-                            bones.Add(l.Key);
+                            bone_indices_map.Add(i, bone_indices_map.Count);
+                            bone_indices.Add(i);
                         }
 
-                        // \todo 点の追加
-                        Vertex va = new Vertex(obj.vertices[f.a].Pos, v[0].Wgt, v[0].Idx, obj.vertices[f.a].Nrm, new Point2(f.ta.x, 1 - f.ta.y));
-                        Vertex vb = new Vertex(obj.vertices[f.b].Pos, v[1].Wgt, v[1].Idx, obj.vertices[f.b].Nrm, new Point2(f.tb.x, 1 - f.tb.y));
-                        Vertex vc = new Vertex(obj.vertices[f.c].Pos, v[2].Wgt, v[2].Idx, obj.vertices[f.c].Nrm, new Point2(f.tc.x, 1 - f.tc.y));
+                        for (int k = 0; k < 3; ++k)
+                        {
+                            UInt32 idx0 = v[k].Idx;
+                            Point4 wgt0 = v[k].Wgt;
+                            byte* idx = (byte*)(&idx0);
+                            float* wgt = (float*)(&wgt0);
 
-                        indices.Add(vh.Add(va));
-                        indices.Add(vh.Add(vc));
-                        indices.Add(vh.Add(vb));
+                            for (int l = 0; l < 4; ++l)
+                                if (wgt[l] > float.Epsilon)
+                                    idx[l] = (byte)bone_indices_map[idx[l]];
+
+                            //v[k]は値型なのでrefvertsに影響しない。
+                            v[k].Idx = idx0;
+                        }
+
+                        Vertex va = new Vertex(obj.vertices[face.a].Pos, v[0].Wgt, v[0].Idx, obj.vertices[face.a].Nrm, new Point2(face.ta.x, 1 - face.ta.y));
+                        Vertex vb = new Vertex(obj.vertices[face.b].Pos, v[1].Wgt, v[1].Idx, obj.vertices[face.b].Nrm, new Point2(face.tb.x, 1 - face.tb.y));
+                        Vertex vc = new Vertex(obj.vertices[face.c].Pos, v[2].Wgt, v[2].Idx, obj.vertices[face.c].Nrm, new Point2(face.tc.x, 1 - face.tc.y));
+
+                        vert_indices.Add(vh.Add(va));
+                        vert_indices.Add(vh.Add(vc));
+                        vert_indices.Add(vh.Add(vb));
                     }
 
-                    // フェイス最適化
-                    ushort[] nidx = NvTriStrip.Optimize(indices.ToArray());
+                    ushort[] optimized_indices = NvTriStrip.Optimize(vert_indices.ToArray());
 
-                    // 頂点のボーン参照ローカルに変換
-                    Vertex[] verts = vh.verts.ToArray();
-
-                    for (int j = 0; j < verts.Length; ++j)
-                    {
-                        uint idx0 = verts[j].Idx;
-                        byte* idx = (byte*)(&idx0);
-                        Point4 wgt0 = verts[j].Wgt;
-                        float* wgt = (float*)(&wgt0);
-
-                        for (int k = 0; k < 4; ++k)
-                            if (wgt[k] > float.Epsilon)
-                                idx[k] = (byte)selected[idx[k]];
-
-                        verts[j].Idx = idx0;
-                    }
-
-                    // サブメッシュ生成
                     TSOSubMesh sub = new TSOSubMesh();
                     sub.spec = mtl;
-                    sub.numbones = bones.Count;
-                    sub.bones = bones.ToArray();
-                    sub.numvertices = nidx.Length;
-                    sub.vertices = new Vertex[nidx.Length];
+                    sub.numbones = bone_indices.Count;
+                    sub.bones = bone_indices.ToArray();
 
-                    for (int j = 0; j < nidx.Length; ++j)
-                        sub.vertices[j] = verts[nidx[j]];
+                    sub.numvertices = optimized_indices.Length;
+                    Vertex[] vertices = new Vertex[optimized_indices.Length];
+                    for (int i = 0; i < optimized_indices.Length; ++i)
+                    {
+                        vertices[i] = vh.verts[optimized_indices[i]];
+                    }
+                    sub.vertices = vertices;
 
                     Console.WriteLine("  {0,8} {1,12}", sub.vertices.Length, sub.bones.Length);
 
                     subs.Add(sub);
 
-                    // 次の周回
-                    List<int> t = faces1;
-                    faces1 = faces2;
-                    faces2 = t;
-                    t.Clear();
+                    List<int> faces_tmp = faces_1;
+                    faces_1 = faces_2;
+                    faces_2 = faces_tmp;
+                    faces_tmp.Clear();
                 }
                 #endregion
-                // \todo TSOMesh生成
                 TSOMesh mesh = new TSOMesh();
                 mesh.name = obj.name;
                 mesh.numsubs = subs.Count;
