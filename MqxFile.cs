@@ -11,14 +11,14 @@ namespace Tso2MqoGui
         public int id;
         public string name;
         public bool tail;
-        //‚È‚¯‚ê‚Î0
+        //ãªã‘ã‚Œã°0
         public int pid;
         public List<int> cids = new List<int>();
 
-        //ª–{position
+        //æ ¹æœ¬position
         public Point3 q;
 
-        //æ’[position
+        //å…ˆç«¯position
         public Point3 p;
 
         public List<MqoWeit> weits;
