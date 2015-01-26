@@ -82,11 +82,13 @@ namespace Tso2MqoGui
                             float* wgt = (float*)(&wgt0);
 
                             int vertex_id = obj.vertices[face.vert_indices[k]].id;
+                            //Console.WriteLine("v.{0} oi:{1} vi:{2}", k, object_id, vertex_id);
                             mqx.UpdateWeits(object_id, vertex_id);
                             for (int l = 0; l < 4; ++l)
                             {
                                 idx[l] = (byte)(mqx.weits[l].bone_id-1);
                                 wgt[l] = mqx.weits[l].weit;
+                                //Console.WriteLine("  w.{0} i:{1} w:{2}", l, idx[l], wgt[l]);
                             }
                             refvs[k].Idx = idx0;
                             refvs[k].Wgt = wgt0;

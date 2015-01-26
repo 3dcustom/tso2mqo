@@ -107,6 +107,7 @@ namespace Tso2MqoGui
             {
                 MqoWeit weit = new MqoWeit();
                 weit.Read(reader);
+                weit.bone_id = this.id;
                 this.weits.Add(weit);
             }
 
