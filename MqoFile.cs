@@ -57,7 +57,6 @@ namespace Tso2MqoGui
 
         public void CreateNormal()
         {
-            // 法線生成
             Point3[] normal = new Point3[vertices.Count];
 
             foreach (MqoFace face in faces)

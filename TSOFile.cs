@@ -681,8 +681,6 @@ namespace Tso2MqoGui
         public UInt32 Idx;
         public Point3 Nrm;
         public Point2 Tex;
-        //public int          Count;
-        //public Weights[]    Weights;
 
         public Vertex(Point3 pos, Point4 wgt, UInt32 idx, Point3 nrm, Point2 tex)
         {
@@ -722,12 +720,4 @@ namespace Tso2MqoGui
             return Pos.Equals(v.Pos) && Nrm.Equals(v.Nrm) && Tex.Equals(v.Tex);
         }
     }
-
-    /*
-    public struct Weights
-    {
-        public int          Index;
-        public float        Weight;
-    }
-    */
 }
