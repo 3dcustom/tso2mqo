@@ -203,27 +203,23 @@ namespace Tso2MqoGui
                 TSOGeneratorRefBone gen = new TSOGeneratorRefBone(config);
                 gen.Generate(file, tbTsoFileRef.Text, tbTsoFile.Text);
             }
-            else
-                if (rbOneBone.Checked)
+            else if (rbOneBone.Checked)
+            {
+                TSOGeneratorOneBone gen = new TSOGeneratorOneBone(config);
+
+                foreach (ListViewItem item in lvObjects.Items)
                 {
-                    TSOGeneratorOneBone gen = new TSOGeneratorOneBone(config);
-
-                    foreach (ListViewItem item in lvObjects.Items)
+                    if (item.SubItems[1].Text == "")
                     {
-                        if (item.SubItems[1].Text == "")
-                        {
-                            MessageBox.Show("すべてのオブジェクトにボーンを設定してください");
-                            return;
-                        }
-
-                        gen.ObjectBoneNames.Add(item.SubItems[0].Text, item.SubItems[1].Text);
+                        MessageBox.Show("すべてのオブジェクトにボーンを設定してください");
+                        return;
                     }
 
-                    gen.Generate(file, tbTsoFileRef.Text, tbTsoFile.Text);
+                    gen.ObjectBoneNames.Add(item.SubItems[0].Text, item.SubItems[1].Text);
                 }
-                else
-                {
-                }
+
+                gen.Generate(file, tbTsoFileRef.Text, tbTsoFile.Text);
+            }
         }
         #region tso->mqo UI
         private void button1_Click(object sender, EventArgs e)
