@@ -97,9 +97,10 @@ namespace Tso2MqoGui
                             continue;
                         }
 
-                        refvs[0] = refverts[vref[face.a]];
-                        refvs[1] = refverts[vref[face.b]];
-                        refvs[2] = refverts[vref[face.c]];
+                        for (int k = 0; k < 3; ++k)
+                        {
+                            refvs[k] = refverts[vref[face.vert_indices[k]]];
+                        }
 
                         adding_bone_indices.Clear();
 

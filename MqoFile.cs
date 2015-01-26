@@ -134,23 +134,34 @@ namespace Tso2MqoGui
 
     public class MqoFace
     {
-        public ushort a, b, c;
+        public ushort[] vert_indices;
         public ushort spec;
-        public Point2 ta, tb, tc;
+        public Point2[] texcoords;
+
+        public ushort a { get { return vert_indices[0]; } set { vert_indices[0] = value; } }
+        public ushort b { get { return vert_indices[1]; } set { vert_indices[1] = value; } }
+        public ushort c { get { return vert_indices[2]; } set { vert_indices[2] = value; } }
+        public Point2 ta { get { return texcoords[0]; } set { texcoords[0] = value; } }
+        public Point2 tb { get { return texcoords[1]; } set { texcoords[1] = value; } }
+        public Point2 tc { get { return texcoords[2]; } set { texcoords[2] = value; } }
 
         public MqoFace()
         {
+            vert_indices = new ushort[3];
+            texcoords = new Point2[3];
         }
 
         public MqoFace(ushort a, ushort b, ushort c, ushort spec, Point2 ta, Point2 tb, Point2 tc)
         {
-            this.a = a;
-            this.b = b;
-            this.c = c;
+            vert_indices = new ushort[3];
+            vert_indices[0] = a;
+            vert_indices[1] = b;
+            vert_indices[2] = c;
             this.spec = spec;
-            this.ta = ta;
-            this.tb = tb;
-            this.tc = tc;
+            texcoords = new Point2[3];
+            texcoords[0] = ta;
+            texcoords[1] = tb;
+            texcoords[2] = tc;
         }
 
         public void Write(TextWriter tw)
