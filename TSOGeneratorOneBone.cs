@@ -53,7 +53,7 @@ namespace Tso2MqoGui
 
                 // マテリアル別に処理を実行
                 List<ushort> vert_indices = new List<ushort>();
-                VertexHeap<Vertex> vh = new VertexHeap<Vertex>();
+                Heap<Vertex> vh = new Heap<Vertex>();
                 List<TSOSubMesh> subs = new List<TSOSubMesh>();
 
                 Console.WriteLine("  vertices bone_indices");
@@ -91,7 +91,7 @@ namespace Tso2MqoGui
                     Vertex[] vertices = new Vertex[optimized_indices.Length];
                     for (int i = 0; i < optimized_indices.Length; ++i)
                     {
-                        vertices[i] = vh.verts[optimized_indices[i]];
+                        vertices[i] = vh.ary[optimized_indices[i]];
                     }
                     sub.vertices = vertices;
 

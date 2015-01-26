@@ -95,6 +95,7 @@
       <SubType>Designer</SubType>
       <DependentUpon>FormMaterial.cs</DependentUpon>
     </EmbeddedResource>
+    <Compile Include="Heap.cs" />
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
@@ -121,7 +122,6 @@
     <Compile Include="TSOGeneratorOneBone.cs" />
     <Compile Include="TSOGeneratorRefBone.cs" />
     <Compile Include="TSOWriter.cs" />
-    <Compile Include="VertexHeap.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="bin\Debug\config.xml" />

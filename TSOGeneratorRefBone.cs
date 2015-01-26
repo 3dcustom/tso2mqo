@@ -66,11 +66,10 @@ namespace Tso2MqoGui
 
                 List<int> faces_1 = new List<int>();
                 List<int> faces_2 = new List<int>();
-                VertexHeap<Vertex> vh = new VertexHeap<Vertex>();
+                Heap<int> bh = new Heap<int>();
+                Heap<Vertex> vh = new Heap<Vertex>();
                 Vertex[] v = new Vertex[3];
-                List<int> bone_indices = new List<int>(16);
                 List<ushort> vert_indices = new List<ushort>();
-                Dictionary<int, int> bone_indices_map = new Dictionary<int, int>();
                 Dictionary<int, bool> adding_bone_indices = new Dictionary<int, bool>();
                 List<TSOSubMesh> subs = new List<TSOSubMesh>();
 
@@ -84,10 +83,9 @@ namespace Tso2MqoGui
                 while (faces_1.Count != 0)
                 {
                     int mtl = obj.faces[faces_1[0]].mtl;
-                    bone_indices_map.Clear();
-                    vert_indices.Clear();
+                    bh.Clear();
                     vh.Clear();
-                    bone_indices.Clear();
+                    vert_indices.Clear();
 
                     foreach (int f in faces_1)
                     {
@@ -116,14 +114,14 @@ namespace Tso2MqoGui
                             {
                                 if (wgt[l] <= float.Epsilon)
                                     continue;
-                                if (bone_indices_map.ContainsKey(idx[l]))
+                                if (bh.map.ContainsKey(idx[l]))
                                     continue;
 
                                 adding_bone_indices[idx[l]] = true;
                             }
                         }
 
-                        if (bone_indices_map.Count + adding_bone_indices.Count > 16)
+                        if (bh.Count + adding_bone_indices.Count > 16)
                         {
                             faces_2.Add(f);
                             continue;
@@ -131,8 +129,7 @@ namespace Tso2MqoGui
 
                         foreach (int i in adding_bone_indices.Keys)
                         {
-                            bone_indices_map.Add(i, bone_indices_map.Count);
-                            bone_indices.Add(i);
+                            bh.Add(i);
                         }
 
                         for (int k = 0; k < 3; ++k)
@@ -143,8 +140,12 @@ namespace Tso2MqoGui
                             float* wgt = (float*)(&wgt0);
 
                             for (int l = 0; l < 4; ++l)
-                                if (wgt[l] > float.Epsilon)
-                                    idx[l] = (byte)bone_indices_map[idx[l]];
+                            {
+                                if (wgt[l] <= float.Epsilon)
+                                    continue;
+
+                                idx[l] = (byte)bh[idx[l]];
+                            }
 
                             //v[k]は値型なのでrefvertsに影響しない。
                             v[k].Idx = idx0;
@@ -163,14 +164,14 @@ namespace Tso2MqoGui
 
                     TSOSubMesh sub = new TSOSubMesh();
                     sub.spec = mtl;
-                    sub.numbones = bone_indices.Count;
-                    sub.bones = bone_indices.ToArray();
+                    sub.numbones = bh.Count;
+                    sub.bones = bh.ary.ToArray();
 
                     sub.numvertices = optimized_indices.Length;
                     Vertex[] vertices = new Vertex[optimized_indices.Length];
                     for (int i = 0; i < optimized_indices.Length; ++i)
                     {
-                        vertices[i] = vh.verts[optimized_indices[i]];
+                        vertices[i] = vh.ary[optimized_indices[i]];
                     }
                     sub.vertices = vertices;
 

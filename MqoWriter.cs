@@ -235,11 +235,11 @@ namespace Tso2MqoGui
 
         public int id; //object_id
         public string name;
-        VertexHeap<UVertex> vh = new VertexHeap<UVertex>();
+        Heap<UVertex> vh = new Heap<UVertex>();
         public List<MqoFace> faces;
 
         public int numvertices { get { return vh.Count; } }
-        public List<UVertex> vertices { get { return vh.verts; } }
+        public List<UVertex> vertices { get { return vh.ary; } }
         public int numfaces { get { return faces.Count; } }
 
         public MqoObjectGen()
