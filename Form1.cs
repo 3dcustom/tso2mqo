@@ -526,8 +526,8 @@ namespace Tso2MqoGui
                     {
                         foreach (TSOSubMesh sub in mesh.sub_meshes)
                         {
-                            TSOMaterial mtl = mesh.file.materials[sub.spec];
-                            sub.spec = materialmap[mtl.Name].Second;
+                            TSOMaterial spec = mesh.file.materials[sub.spec];
+                            sub.spec = materialmap[spec.Name].Second;
                         }
                     }
 

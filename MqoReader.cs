@@ -448,7 +448,7 @@ namespace Tso2MqoGui
                             else if (t2.StartsWith("m("))
                             {
                                 string[] t3 = SplitParam(t);
-                                f.mtl = ushort.Parse(t3[1]);
+                                f.spec = ushort.Parse(t3[1]);
                             }
                             else if (t2.StartsWith("uv("))
                             {
@@ -484,8 +484,8 @@ namespace Tso2MqoGui
                             else if (t2.StartsWith("m("))
                             {
                                 string[] t3 = SplitParam(t);
-                                f.mtl = ushort.Parse(t3[1]);
-                                f2.mtl = f.mtl;
+                                f.spec = ushort.Parse(t3[1]);
+                                f2.spec = f.spec;
                             }
                             else if (t2.StartsWith("uv("))
                             {

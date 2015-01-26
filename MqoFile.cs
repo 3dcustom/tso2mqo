@@ -134,19 +134,20 @@ namespace Tso2MqoGui
 
     public class MqoFace
     {
-        public ushort a, b, c, mtl;
+        public ushort a, b, c;
+        public ushort spec;
         public Point2 ta, tb, tc;
 
         public MqoFace()
         {
         }
 
-        public MqoFace(ushort a, ushort b, ushort c, ushort mtl, Point2 ta, Point2 tb, Point2 tc)
+        public MqoFace(ushort a, ushort b, ushort c, ushort spec, Point2 ta, Point2 tb, Point2 tc)
         {
             this.a = a;
             this.b = b;
             this.c = c;
-            this.mtl = mtl;
+            this.spec = spec;
             this.ta = ta;
             this.tb = tb;
             this.tc = tc;
@@ -155,7 +156,7 @@ namespace Tso2MqoGui
         public void Write(TextWriter tw)
         {
             tw.WriteLine("\t\t{0} V({1} {2} {3}) M({10}) UV({4:F5} {5:F5} {6:F5} {7:F5} {8:F5} {9:F5})",
-                3, a, b, c, ta.x, ta.y, tb.x, tb.y, tc.x, tc.y, mtl);
+                3, a, b, c, ta.x, ta.y, tb.x, tb.y, tc.x, tc.y, spec);
         }
     }
 }

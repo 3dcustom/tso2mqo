@@ -59,13 +59,13 @@ namespace Tso2MqoGui
                 Console.WriteLine("  vertices bone_indices");
                 Console.WriteLine("  -------- ------------");
 
-                for (int mtl = 0; mtl < nummaterials; ++mtl)
+                for (int spec = 0; spec < nummaterials; ++spec)
                 {
                     vert_indices.Clear();
 
                     foreach (MqoFace face in obj.faces)
                     {
-                        if (face.mtl != mtl)
+                        if (face.spec != spec)
                             continue;
 
                         Vertex va = new Vertex(obj.vertices[face.a].Pos, wgt, idx, obj.vertices[face.a].Nrm, new Point2(face.ta.x, 1 - face.ta.y));
@@ -83,7 +83,7 @@ namespace Tso2MqoGui
                     ushort[] optimized_indices = NvTriStrip.Optimize(vert_indices.ToArray());
 
                     TSOSubMesh sub = new TSOSubMesh();
-                    sub.spec = mtl;
+                    sub.spec = spec;
                     sub.numbones = bones.Length;
                     sub.bones = bones;
 

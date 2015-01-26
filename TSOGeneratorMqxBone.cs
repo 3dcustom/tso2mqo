@@ -34,7 +34,7 @@ namespace Tso2MqoGui
                 for (int i = 0, n = obj.faces.Count; i < n; ++i)
                     faces_1.Add(i);
 
-                List<ushort> indices = new List<ushort>();
+                List<ushort> vert_indices = new List<ushort>();
 
                     foreach (int f in faces_1)
                     {

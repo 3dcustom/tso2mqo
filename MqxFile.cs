@@ -11,8 +11,10 @@ namespace Tso2MqoGui
         public int id;
         public string name;
         public bool tail;
+        //親id
         //なければ0
         public int pid;
+        //子id
         public List<int> cids = new List<int>();
 
         //根本position

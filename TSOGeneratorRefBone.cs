@@ -82,7 +82,7 @@ namespace Tso2MqoGui
 
                 while (faces_1.Count != 0)
                 {
-                    int mtl = obj.faces[faces_1[0]].mtl;
+                    int spec = obj.faces[faces_1[0]].spec;
                     bh.Clear();
                     vh.Clear();
                     vert_indices.Clear();
@@ -91,7 +91,7 @@ namespace Tso2MqoGui
                     {
                         MqoFace face = obj.faces[f];
 
-                        if (face.mtl != mtl)
+                        if (face.spec != spec)
                         {
                             faces_2.Add(f);
                             continue;
@@ -163,7 +163,7 @@ namespace Tso2MqoGui
                     ushort[] optimized_indices = NvTriStrip.Optimize(vert_indices.ToArray());
 
                     TSOSubMesh sub = new TSOSubMesh();
-                    sub.spec = mtl;
+                    sub.spec = spec;
                     sub.numbones = bh.Count;
                     sub.bones = bh.ary.ToArray();
 
