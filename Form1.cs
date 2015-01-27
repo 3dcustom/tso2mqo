@@ -200,8 +200,16 @@ namespace Tso2MqoGui
 
             if (rbRefBone.Checked)
             {
-                TSOGeneratorMqxBone gen = new TSOGeneratorMqxBone(config);
-                gen.Generate(file, tbTsoFileRef.Text, tbTsoFile.Text);
+                if (tbTsoFileRef.Text == "")
+                {
+                    TSOGeneratorMqxBone gen = new TSOGeneratorMqxBone(config);
+                    gen.Generate(file, tbTsoFileRef.Text, tbTsoFile.Text);
+                }
+                else
+                {
+                    TSOGeneratorRefBone gen = new TSOGeneratorRefBone(config);
+                    gen.Generate(file, tbTsoFileRef.Text, tbTsoFile.Text);
+                }
             }
             else if (rbOneBone.Checked)
             {

@@ -51,16 +51,21 @@ namespace Tso2MqoGui
                     else
                     {
                         if (mqo_file == null)
-                            throw new ArgumentException("-mso:ファイル名 の形式で入力Mqoファイル名を指定してください");
-                        if (tsoref_file == null)
-                            throw new ArgumentException("-ref:ファイル名 の形式で参照Tsoファイル名を指定してください");
+                            throw new ArgumentException("-mqo:ファイル名 の形式で入力Mqoファイル名を指定してください");
 
                         TSOGeneratorConfig config = new TSOGeneratorConfig();
                         config.cui = true;
                         config.ShowMaterials = false;
-                        TSOGeneratorRefBone gen = new TSOGeneratorRefBone(config);
-
-                        gen.Generate(mqo_file, tsoref_file, tso_file);
+                        if (tsoref_file == null)
+                        {
+                            TSOGeneratorMqxBone gen = new TSOGeneratorMqxBone(config);
+                            gen.Generate(mqo_file, tsoref_file, tso_file);
+                        }
+                        else
+                        {
+                            TSOGeneratorRefBone gen = new TSOGeneratorRefBone(config);
+                            gen.Generate(mqo_file, tsoref_file, tso_file);
+                        }
                     }
                 }
                 catch (ArgumentException e)
