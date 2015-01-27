@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Text;
 using System.ComponentModel;
@@ -24,12 +25,7 @@ namespace Tso2MqoGui
         {
         }
 
-        [System.Diagnostics.Conditional("DEBUG_DETAIL")]
-        public static void WriteLine(string s)
-        {
-            System.Diagnostics.Debug.WriteLine(s);
-        }
-
+        [Conditional("DEBUG_DETAIL")]
         public static void ExchangeChannel(byte[] data, int depth)
         {
             for (int j = 0; j < data.Length; j += depth)
@@ -62,8 +58,6 @@ namespace Tso2MqoGui
                 nodes[i].path = ReadString();
                 nodes[i].name = nodes[i].path.Substring(nodes[i].path.LastIndexOf('|') + 1);
                 nodemap.Add(nodes[i].path, nodes[i]);
-
-                WriteLine(i + ": " + nodes[i].path);
             }
 
             for (int i = 0; i < count; ++i)
@@ -74,12 +68,9 @@ namespace Tso2MqoGui
                     continue;
 
                 string pname = nodes[i].path.Substring(0, index);
-                WriteLine(pname);
                 nodes[i].parent = nodemap[pname];
                 nodes[i].parent.children.Add(nodes[i]);
             }
-
-            WriteLine(r.BaseStream.Position.ToString("X"));
 
             count = r.ReadInt32();
 
@@ -88,8 +79,6 @@ namespace Tso2MqoGui
             {
                 nodes[i].matrix = ReadMatrix();
             }
-
-            WriteLine(r.BaseStream.Position.ToString("X"));
 
             //----- テクスチャ ---------------------------------------------
             count = r.ReadInt32();
@@ -109,8 +98,6 @@ namespace Tso2MqoGui
                 texturemap.Add(textures[i].name, textures[i]);
 
                 ExchangeChannel(textures[i].data, textures[i].depth);
-
-                WriteLine(r.BaseStream.Position.ToString("X"));
             }
 
             //----- エフェクト ---------------------------------------------
@@ -128,8 +115,6 @@ namespace Tso2MqoGui
                     sb.Append(ReadString()).Append('\n');
 
                 effects[i].code = sb.ToString();
-
-                WriteLine(r.BaseStream.Position.ToString("X"));
             }
 
             //----- マテリアル ---------------------------------------------
@@ -150,14 +135,12 @@ namespace Tso2MqoGui
 
                 materials[i].code = sb.ToString();
                 materials[i].ParseParameters();
-
-                WriteLine(r.BaseStream.Position.ToString("X"));
             }
 
             //----- メッシュ -----------------------------------------------
             count = r.ReadInt32();
             meshes = new TSOMesh[count];
-            int check = 0;
+
             for (int i = 0; i < count; ++i)
             {
                 meshes[i] = new TSOMesh();
@@ -187,14 +170,8 @@ namespace Tso2MqoGui
                     {
                         ReadVertex(ref v[k]);
                     }
-
-                    WriteLine(r.BaseStream.Position.ToString("X"));
-                    System.Diagnostics.Debug.WriteLine(r.BaseStream.Position.ToString("X"));
                 }
             }
-
-            WriteLine(r.BaseStream.Position.ToString("X"));
-            WriteLine(check.ToString("X"));
 
             r.BaseStream.Dispose();
         }
@@ -382,12 +359,11 @@ namespace Tso2MqoGui
                         i.Substring(0, n1).Trim(),
                         i.Substring(n1, n2 - n1).Trim(),
                         i.Substring(n2 + 1).Trim());
-                    TSOFile.WriteLine(p.ToString());
                     Add(p.Name, p);
                 }
                 catch (Exception e)
                 {
-                    System.Diagnostics.Debug.WriteLine(e);
+                    Debug.WriteLine(e);
                 }
             }
         }
@@ -514,7 +490,7 @@ namespace Tso2MqoGui
                 case "ShadeBlend": shadeBlend = GetFloat(value); break;  // = [10]
                 case "HighLightPower": highLightPower = GetFloat(value); break;  // = [100]
                 default:
-                    TSOFile.WriteLine("Unknown parameter. type=" + type + ", name=" + name + ", value=" + value);
+                    Debug.WriteLine("Unknown parameter. type=" + type + ", name=" + name + ", value=" + value);
                     break;
             }
         }
