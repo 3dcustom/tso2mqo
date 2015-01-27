@@ -84,7 +84,7 @@ namespace Tso2MqoGui
                             mqx.UpdateWeits(object_id, vertex_id);
                             for (int l = 0; l < 4; ++l)
                             {
-                                idx[l] = (byte)(mqx.weits[l].bone_id-1);
+                                idx[l] = (byte)mqx.weits[l].node_id;
                                 wgt[l] = mqx.weits[l].weit;
                                 //Console.WriteLine("  w.{0} i:{1} w:{2}", l, idx[l], wgt[l]);
                             }

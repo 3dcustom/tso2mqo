@@ -9,6 +9,7 @@ namespace Tso2MqoGui
     public class MqoBone
     {
         public int id;
+        public int node_id; //idx of bones
         public string name;
         public string path;
         public bool tail;
@@ -128,7 +129,7 @@ namespace Tso2MqoGui
             {
                 MqoWeit weit = new MqoWeit();
                 weit.Read(reader);
-                weit.bone_id = this.id;
+                weit.node_id = this.node_id;
                 this.weits.Add(weit);
             }
 
@@ -157,7 +158,7 @@ namespace Tso2MqoGui
     {
         public int object_id;
         public int vertex_id;
-        public int bone_id;
+        public int node_id;//idx of bones
         public float weit;
 
         public void Write(XmlWriter writer)
