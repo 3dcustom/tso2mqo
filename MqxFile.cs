@@ -15,6 +15,7 @@ namespace Tso2MqoGui
         //親id
         //なければ0
         public int pid;
+        public MqoBone parent;
         //子id
         public List<int> cids = new List<int>();
 

@@ -21,8 +21,6 @@ namespace Tso2MqoGui
         // ボーン配列 [out]
         public MqoBone[] bones;
 
-        Dictionary<int, MqoBone> bone_idmap;
-
         //頂点ウェイト配列 [out]
         public MqoWeit[] weits;
 
@@ -49,6 +47,52 @@ namespace Tso2MqoGui
             reader.Close();
 
             return true;
+        }
+
+        Dictionary<int, MqoBone> bone_idmap;
+
+        // create bone_idmap
+        // map id to bone
+        void CreateBoneMap()
+        {
+            bone_idmap = new Dictionary<int, MqoBone>();
+            foreach (MqoBone bone in bones)
+            {
+                bone_idmap[bone.id] = bone;
+            }
+        }
+        void UpdateBones()
+        {
+            // assign node.parent
+            foreach (MqoBone bone in bones)
+            {
+                if (bone.pid != 0)
+                {
+                    bone.parent = bone_idmap[bone.pid];
+                }
+                else
+                    bone.parent = null;
+            }
+            // assign node.path
+            foreach (MqoBone bone in bones)
+            {
+                if (bone.parent != null)
+                {
+                    bone.path = bone.parent.path + "|" + bone.name;
+                }
+                else
+                    bone.path = "|" + bone.name;
+            }
+            // assign node.local_position
+            foreach (MqoBone bone in bones)
+            {
+                if (bone.parent != null)
+                {
+                    bone.local_position = bone.world_position - bone.parent.world_position;
+                }
+                else
+                    bone.local_position = bone.world_position;
+            }
         }
 
         public void Read(XmlReader reader)
@@ -78,36 +122,8 @@ namespace Tso2MqoGui
             len = i;
             Array.Resize(ref bones, len);
 
-            // create bone_idmap
-            bone_idmap = new Dictionary<int, MqoBone>(len);
-            foreach (MqoBone bone in bones)
-            {
-                bone_idmap[bone.id] = bone;
-            }
-
-            // assign node.path
-            foreach (MqoBone bone in bones)
-            {
-                if (bone.pid != 0)
-                {
-                    MqoBone parent = bone_idmap[bone.pid];
-                    bone.path = parent.path + "|" + bone.name;
-                }
-                else
-                    bone.path = "|" + bone.name;
-            }
-
-            // assign node.local_position
-            foreach (MqoBone bone in bones)
-            {
-                if (bone.pid != 0)
-                {
-                    MqoBone parent = bone_idmap[bone.pid];
-                    bone.local_position = bone.world_position - parent.world_position;
-                }
-                else
-                    bone.local_position = bone.world_position;
-            }
+            CreateBoneMap();
+            UpdateBones();
 
             while (reader.IsStartElement("Obj"))
             {
