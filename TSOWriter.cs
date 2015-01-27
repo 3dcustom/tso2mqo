@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
@@ -45,7 +45,7 @@ namespace Tso2MqoGui
 
         public static void Write(BinaryWriter bw, TSONode item)
         {
-            Write(bw, item.Name);
+            Write(bw, item.Path);
         }
 
         public static void Write(BinaryWriter bw, Matrix44 item)

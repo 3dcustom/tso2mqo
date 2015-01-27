@@ -59,21 +59,21 @@ namespace Tso2MqoGui
             {
                 nodes[i] = new TSONode();
                 nodes[i].id = i;
-                nodes[i].name = ReadString();
-                nodes[i].sname = nodes[i].name.Substring(nodes[i].name.LastIndexOf('|') + 1);
-                nodemap.Add(nodes[i].name, nodes[i]);
+                nodes[i].path = ReadString();
+                nodes[i].name = nodes[i].path.Substring(nodes[i].path.LastIndexOf('|') + 1);
+                nodemap.Add(nodes[i].path, nodes[i]);
 
-                WriteLine(i + ": " + nodes[i].name);
+                WriteLine(i + ": " + nodes[i].path);
             }
 
             for (int i = 0; i < count; ++i)
             {
-                int index = nodes[i].name.LastIndexOf('|');
+                int index = nodes[i].path.LastIndexOf('|');
 
                 if (index <= 0)
                     continue;
 
-                string pname = nodes[i].name.Substring(0, index);
+                string pname = nodes[i].path.Substring(0, index);
                 WriteLine(pname);
                 nodes[i].parent = nodemap[pname];
                 nodes[i].parent.children.Add(nodes[i]);
@@ -235,8 +235,8 @@ namespace Tso2MqoGui
     public class TSONode
     {
         internal int id;
+        internal string path;
         internal string name;
-        internal string sname;
         internal Matrix44 matrix;
         internal Matrix44 world;
         internal List<TSONode> children = new List<TSONode>();
@@ -245,9 +245,9 @@ namespace Tso2MqoGui
         [Category("General")]
         public int ID { get { return id; } }
         [Category("General")]
-        public string Name { get { return name; } }
+        public string Path { get { return path; } }
         [Category("General")]
-        public string ShortName { get { return sname; } }
+        public string Name { get { return name; } }
         [Category("Detail")]
         public Matrix44 Matrix { get { return matrix; } set { matrix = value; } }
         [Category("Detail")]
@@ -256,7 +256,7 @@ namespace Tso2MqoGui
         public override string ToString()
         {
             StringBuilder sb = new StringBuilder();
-            sb.Append("Name:           ").AppendLine(name);
+            sb.Append("Path:           ").AppendLine(path);
             sb.Append("Matrix:         ").AppendLine(matrix.ToString());
             sb.Append("Children.Count: ").AppendLine(children.Count.ToString());
             return sb.ToString();

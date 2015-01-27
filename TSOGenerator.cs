@@ -122,7 +122,7 @@ namespace Tso2MqoGui
                 bw.Write(tsoref.nodes.Length);
 
                 foreach (TSONode i in tsoref.nodes)
-                    WriteString(bw, i.Name);
+                    WriteString(bw, i.Path);
             }
             else if (mqx != null)
             {

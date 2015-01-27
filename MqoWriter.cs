@@ -202,7 +202,7 @@ namespace Tso2MqoGui
             {
                 MqoBone bone = new MqoBone();
                 bone.id = node.id+1;
-                bone.name = node.ShortName;
+                bone.name = node.Name;
                 bone.tail = node.children.Count == 0;
 
                 if (node.parent == null)

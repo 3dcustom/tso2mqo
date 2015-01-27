@@ -249,7 +249,7 @@ namespace Tso2MqoGui
 
         private void BuildBoneTree(TreeNodeCollection nodes, TSONode node)
         {
-            TreeNode tn = nodes.Add(node.ShortName);
+            TreeNode tn = nodes.Add(node.Name);
             tn.Tag = node;
 
             if (node.children != null)

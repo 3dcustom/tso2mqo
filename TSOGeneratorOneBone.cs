@@ -22,7 +22,7 @@ namespace Tso2MqoGui
 
             foreach (TSONode i in tsoref.nodes)
             {
-                node_idmap.Add(i.ShortName, i.ID);
+                node_idmap.Add(i.Name, i.ID);
             }
         }
 
