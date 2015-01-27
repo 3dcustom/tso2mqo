@@ -42,8 +42,9 @@ namespace Tso2MqoGui
             }
         }
 
-        public MqoBone()
+        public MqoBone(int node_id)
         {
+            this.node_id = node_id;
             weits = new List<MqoWeit>(2048*3*4);
         }
 
@@ -158,7 +159,7 @@ namespace Tso2MqoGui
     {
         public int object_id;
         public int vertex_id;
-        public int node_id;//idx of bones
+        public int node_id; //idx of bones
         public float weit;
 
         public void Write(XmlWriter writer)

@@ -113,9 +113,8 @@ namespace Tso2MqoGui
             int i = 0;
             while (reader.IsStartElement("Bone"))
             {
-                MqoBone bone = new MqoBone();
+                MqoBone bone = new MqoBone(i);
                 bone.Read(reader);
-                bone.node_id = i;
                 this.bones[i++] = bone;
             }
             reader.ReadEndElement();//BoneSet

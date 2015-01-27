@@ -200,7 +200,7 @@ namespace Tso2MqoGui
 
             foreach (TSONode node in tso.nodes)
             {
-                MqoBone bone = new MqoBone();
+                MqoBone bone = new MqoBone(node.id);
                 bone.id = node.id+1;
                 bone.name = node.Name;
                 bone.tail = node.children.Count == 0;
