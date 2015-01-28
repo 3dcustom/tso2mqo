@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Xml;
+using System.Windows.Forms;
 
 namespace Tso2MqoGui
 {
@@ -64,10 +65,14 @@ namespace Tso2MqoGui
 
         Dictionary<string, bool> bone_turnedmap;
 
+        static string GetTurnedPath()
+        {
+            return Path.Combine(Application.StartupPath, @"turned.txt");
+        }
         void CreateBoneTurnedMap()
         {
             bone_turnedmap = new Dictionary<string, bool>();
-            using (StreamReader reader = new StreamReader(@"turned.txt"))
+            using (StreamReader reader = new StreamReader(GetTurnedPath()))
             {
                 while (true)
                 {
