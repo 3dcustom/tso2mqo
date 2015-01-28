@@ -25,7 +25,6 @@ namespace Tso2MqoGui
         {
         }
 
-        [Conditional("DEBUG_DETAIL")]
         public static void ExchangeChannel(byte[] data, int depth)
         {
             for (int j = 0; j < data.Length; j += depth)
