@@ -65,14 +65,14 @@ namespace Tso2MqoGui
 
         Dictionary<string, bool> bone_turnedmap;
 
-        static string GetTurnedPath()
+        static string GetTurnNodesPath()
         {
-            return Path.Combine(Application.StartupPath, @"turned.txt");
+            return Path.Combine(Application.StartupPath, @"turnnodes.txt");
         }
         void CreateBoneTurnedMap()
         {
             bone_turnedmap = new Dictionary<string, bool>();
-            using (StreamReader reader = new StreamReader(GetTurnedPath()))
+            using (StreamReader reader = new StreamReader(GetTurnNodesPath()))
             {
                 while (true)
                 {
