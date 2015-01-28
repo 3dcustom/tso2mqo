@@ -30,11 +30,18 @@ namespace Tso2MqoGui
 
         public Point3 world_position;
         public Point3 local_position;
+        public bool turned;
+        public bool world_turned;
         public Matrix44 matrix
         {
             get
             {
                 Matrix44 m = Matrix44.Identity;
+                if (turned)
+                {
+                    m.m11 = -1.0f;
+                    m.m33 = -1.0f;
+                }
                 m.m41 = local_position.x;
                 m.m42 = local_position.y;
                 m.m43 = local_position.z;

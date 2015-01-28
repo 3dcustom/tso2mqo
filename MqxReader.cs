@@ -61,6 +61,25 @@ namespace Tso2MqoGui
                 bone_idmap[bone.id] = bone;
             }
         }
+
+        Dictionary<string, bool> bone_turnedmap;
+
+        void CreateBoneTurnedMap()
+        {
+            bone_turnedmap = new Dictionary<string, bool>();
+            using (StreamReader reader = new StreamReader(@"turned.txt"))
+            {
+                while (true)
+                {
+                    string line = reader.ReadLine();
+
+                    if (line == null)
+                        break;
+
+                    bone_turnedmap[line] = true;
+                }
+            }
+        }
         void UpdateBones()
         {
             // assign node.parent
@@ -83,12 +102,32 @@ namespace Tso2MqoGui
                 else
                     bone.path = "|" + bone.name;
             }
+            // assign node.turned
+            foreach (MqoBone bone in bones)
+            {
+                bone.turned = bone_turnedmap.ContainsKey(bone.name);
+            }
+            // assign node.world_turned
+            foreach (MqoBone bone in bones)
+            {
+                if (bone.parent != null)
+                {
+                    bone.world_turned = bone.parent.world_turned ^ bone.turned;
+                }
+                else
+                    bone.world_turned = bone.turned;
+            }
             // assign node.local_position
             foreach (MqoBone bone in bones)
             {
                 if (bone.parent != null)
                 {
                     bone.local_position = bone.world_position - bone.parent.world_position;
+                    if (bone.parent.world_turned)
+                    {
+                        bone.local_position.x = -bone.local_position.x;
+                        bone.local_position.z = -bone.local_position.z;
+                    }
                 }
                 else
                     bone.local_position = bone.world_position;
@@ -123,6 +162,7 @@ namespace Tso2MqoGui
             Array.Resize(ref bones, len);
 
             CreateBoneMap();
+            CreateBoneTurnedMap();
             UpdateBones();
 
             while (reader.IsStartElement("Obj"))
