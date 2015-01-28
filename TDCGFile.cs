@@ -9,21 +9,6 @@ namespace Tso2MqoGui
     {
         protected BinaryReader r;
 
-        public TDCGFile(string file)
-            : this(File.OpenRead(file))
-        {
-        }
-
-        public TDCGFile(Stream s)
-            : this(new BinaryReader(s))
-        {
-        }
-
-        public TDCGFile(BinaryReader r)
-        {
-            this.r = r;
-        }
-
         public void ReadVertex(ref Vertex v)
         {
             v.Pos.X = r.ReadSingle();

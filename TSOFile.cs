@@ -17,10 +17,6 @@ namespace Tso2MqoGui
         internal TSOMaterial[] materials;
         internal TSOMesh[] meshes;
 
-        public TSOFile(string file) : base(file) { }
-        public TSOFile(Stream s) : base(s) { }
-        public TSOFile(BinaryReader r) : base(r) { }
-
         public void SaveTo(string file)
         {
         }
@@ -35,7 +31,16 @@ namespace Tso2MqoGui
             }
         }
 
-        public void ReadAll()
+        public void Load(string path)
+        {
+            using (BinaryReader reader = new BinaryReader(File.OpenRead(path)))
+            {
+                this.r = reader;
+                ReadAll();
+            }
+        }
+
+        void ReadAll()
         {
             byte[] magic = r.ReadBytes(4);
 
@@ -171,8 +176,6 @@ namespace Tso2MqoGui
                     }
                 }
             }
-
-            r.BaseStream.Dispose();
         }
 
         // ボーンをグローバルな番号に変換

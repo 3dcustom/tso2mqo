@@ -355,8 +355,8 @@ namespace Tso2MqoGui
                 }
 
                 // ボーン構造
-                TSOFile tso = new TSOFile(tbTsoFileRef.Text);
-                tso.ReadAll();
+                TSOFile tso = new TSOFile();
+                tso.Load(tbTsoFileRef.Text);
                 tvBones.Visible = false;
                 tvBones.Nodes.Clear();
                 BuildBoneTree(tvBones.Nodes, tso.nodes[0]);
@@ -443,8 +443,8 @@ namespace Tso2MqoGui
                     node.Name = file;
                     node.Checked = true;
 
-                    TSOFile tso = new TSOFile(file);
-                    tso.ReadAll();
+                    TSOFile tso = new TSOFile();
+                    tso.Load(file);
 
                     foreach (TSOMesh j in tso.meshes)
                     {
@@ -470,11 +470,11 @@ namespace Tso2MqoGui
 
                 foreach (TreeNode node in tvMerge.Nodes)
                 {
-                    TSOFile tso = new TSOFile(node.Text);
+                    TSOFile tso = new TSOFile();
                     last = tso;
                     ulong mtls = 0;
                     ulong mask = 1;
-                    tso.ReadAll();
+                    tso.Load(node.Text);
 
                     foreach (TSOMesh mesh in tso.meshes)
                     {

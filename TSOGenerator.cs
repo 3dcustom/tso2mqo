@@ -30,8 +30,8 @@ namespace Tso2MqoGui
 
         public TSOFile LoadTSO(string file)
         {
-            TSOFile tso = new TSOFile(file);
-            tso.ReadAll();
+            TSOFile tso = new TSOFile();
+            tso.Load(file);
             return tso;
         }
 
