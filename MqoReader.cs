@@ -499,6 +499,9 @@ namespace Tso2MqoGui
                         obj.faces.Add(f2);
                     }
                     break;
+                default:
+                    Console.WriteLine("unsupported: nface {0}", nface);
+                    break;
             }
             return true;
         }

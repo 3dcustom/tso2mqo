@@ -340,8 +340,8 @@ namespace Tso2MqoGui
                 // オブジェクト
                 MqoReader mqo = new MqoReader();
                 mqo.Load(tbMqoFile.Text);
-                lvObjects.Items.Clear();
 
+                lvObjects.Items.Clear();
                 foreach (MqoObject obj in mqo.Objects)
                 {
                     ListViewItem item = lvObjects.Items.Add(obj.name);
