@@ -11,7 +11,7 @@ namespace Tso2MqoGui
 
         static char[] param_delimiters = new char[] { ' ', '\t', '(', ')' };
 
-        StreamReader sr;
+        StreamReader reader;
         MqoFile mqo;
         MqoObject obj;
 
@@ -21,9 +21,9 @@ namespace Tso2MqoGui
 
         public void Load(string path)
         {
-            using (FileStream fs = File.OpenRead(path))
+            using (FileStream stream = File.OpenRead(path))
             {
-                sr = new StreamReader(fs, Encoding.Default);
+                reader = new StreamReader(stream, Encoding.Default);
                 mqo = new MqoFile();
                 ReadAll();
             }
@@ -101,7 +101,7 @@ namespace Tso2MqoGui
         {
             for (int lineno = 1; ; ++lineno)
             {
-                string line = sr.ReadLine();
+                string line = reader.ReadLine();
 
                 if (line == null)
                     break;
@@ -293,16 +293,15 @@ namespace Tso2MqoGui
             for (int i = 1; i < tokens.Length; ++i)
             {
                 string t = tokens[i];
-                string t2 = t.ToLower();
 
-                if (t2.StartsWith("shader(")) m.shader = int.Parse(SplitParam(t)[1]);
-                else if (t2.StartsWith("col(")) m.col = Color3.Parse(SplitParam(t), 1);
-                else if (t2.StartsWith("dif(")) m.dif = float.Parse(SplitParam(t)[1]);
-                else if (t2.StartsWith("amb(")) m.amb = float.Parse(SplitParam(t)[1]);
-                else if (t2.StartsWith("emi(")) m.emi = float.Parse(SplitParam(t)[1]);
-                else if (t2.StartsWith("spc(")) m.spc = float.Parse(SplitParam(t)[1]);
-                else if (t2.StartsWith("power(")) m.power = float.Parse(SplitParam(t)[1]);
-                else if (t2.StartsWith("tex(")) m.tex = t.Substring(3).Trim('(', ')', '"');
+                if (t.StartsWith("shader(")) m.shader = int.Parse(SplitParam(t)[1]);
+                else if (t.StartsWith("col(")) m.col = Color3.Parse(SplitParam(t), 1);
+                else if (t.StartsWith("dif(")) m.dif = float.Parse(SplitParam(t)[1]);
+                else if (t.StartsWith("amb(")) m.amb = float.Parse(SplitParam(t)[1]);
+                else if (t.StartsWith("emi(")) m.emi = float.Parse(SplitParam(t)[1]);
+                else if (t.StartsWith("spc(")) m.spc = float.Parse(SplitParam(t)[1]);
+                else if (t.StartsWith("power(")) m.power = float.Parse(SplitParam(t)[1]);
+                else if (t.StartsWith("tex(")) m.tex = t.Substring(3).Trim('(', ')', '"');
             }
             return true;
         }
@@ -389,7 +388,7 @@ namespace Tso2MqoGui
 
             for (int lineno = 1; ; ++lineno)
             {
-                string line = sr.ReadLine();
+                string line = reader.ReadLine();
 
                 if (line == null)
                     break;
@@ -436,21 +435,20 @@ namespace Tso2MqoGui
                         for (int i = 1; i < tokens.Length; ++i)
                         {
                             string t = tokens[i];
-                            string t2 = t.ToLower();
 
-                            if (t2.StartsWith("v("))
+                            if (t.StartsWith("V("))
                             {
                                 string[] t3 = SplitParam(t);
                                 f.a = ushort.Parse(t3[1]);
                                 f.b = ushort.Parse(t3[2]);
                                 f.c = ushort.Parse(t3[3]);
                             }
-                            else if (t2.StartsWith("m("))
+                            else if (t.StartsWith("M("))
                             {
                                 string[] t3 = SplitParam(t);
                                 f.spec = ushort.Parse(t3[1]);
                             }
-                            else if (t2.StartsWith("uv("))
+                            else if (t.StartsWith("UV("))
                             {
                                 string[] t3 = SplitParam(t);
                                 f.ta = Point2.Parse(t3, 1);
@@ -469,9 +467,8 @@ namespace Tso2MqoGui
                         for (int i = 1; i < tokens.Length; ++i)
                         {
                             string t = tokens[i];
-                            string t2 = t.ToLower();
 
-                            if (t2.StartsWith("v("))
+                            if (t.StartsWith("V("))
                             {
                                 string[] t3 = SplitParam(t);
                                 f.a = ushort.Parse(t3[1]);
@@ -481,13 +478,13 @@ namespace Tso2MqoGui
                                 f2.b = f.c;
                                 f2.c = ushort.Parse(t3[4]);
                             }
-                            else if (t2.StartsWith("m("))
+                            else if (t.StartsWith("M("))
                             {
                                 string[] t3 = SplitParam(t);
                                 f.spec = ushort.Parse(t3[1]);
                                 f2.spec = f.spec;
                             }
-                            else if (t2.StartsWith("uv("))
+                            else if (t.StartsWith("UV("))
                             {
                                 string[] t3 = SplitParam(t);
                                 f.ta = Point2.Parse(t3, 1);
