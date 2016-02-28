@@ -42,7 +42,7 @@ namespace Tso2MqoGui
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public struct BITMAPINFOHEADER
     {
-        public DWORD biSize;
+        //public DWORD biSize;
         public LONG biWidth;
         public LONG biHeight;
         public WORD biPlanes;
@@ -53,5 +53,9 @@ namespace Tso2MqoGui
         public LONG biYPelsPerMeter;
         public DWORD biClrUsed;
         public DWORD biClrImportant;
+        public DWORD bV5RedMask;
+        public DWORD bV5GreenMask;
+        public DWORD bV5BlueMask;
+        public DWORD bV5AlphaMask;
     }
 }

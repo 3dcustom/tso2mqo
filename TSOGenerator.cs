@@ -401,17 +401,10 @@ namespace Tso2MqoGui
                 default: throw new Exception("Unsupported texture file: " + file);
             }
 
-            for (int i = 0, n = tex.data.Length; i < n; i += tex.Depth)
-            {
-                byte b = tex.data[i + 0];
-                tex.data[i + 0] = tex.data[i + 2];
-                tex.data[i + 2] = b;
-            }
-
             return tex;
         }
 
-        public unsafe TSOTex LoadTarga(string file)
+        unsafe TSOTex LoadTarga(string file)
         {
             using (FileStream fs = File.OpenRead(file))
             {
@@ -420,9 +413,10 @@ namespace Tso2MqoGui
 
                 Marshal.Copy(br.ReadBytes(sizeof(TARGA_HEADER)), 0, (IntPtr)(&header), sizeof(TARGA_HEADER));
 
-                if (header.imagetype != 0x02) throw new Exception("Invalid imagetype: " + file);
-                if (header.depth != 24
-                && header.depth != 32) throw new Exception("Invalid depth: " + file);
+                if (header.imagetype != 0x02)
+                    throw new Exception("Invalid imagetype: " + file);
+                if (header.depth != 24 && header.depth != 32)
+                    throw new Exception("Invalid depth: " + file);
 
                 TSOTex tex = new TSOTex();
                 tex.depth = header.depth / 8;
@@ -431,11 +425,18 @@ namespace Tso2MqoGui
                 tex.File = file;
                 tex.data = br.ReadBytes(tex.width * tex.height * tex.depth);
 
+                for (int i = 0, n = tex.data.Length; i < n; i += tex.Depth)
+                {
+                    byte b = tex.data[i + 0];
+                    tex.data[i + 0] = tex.data[i + 2];
+                    tex.data[i + 2] = b;
+                }
+
                 return tex;
             }
         }
 
-        public unsafe TSOTex LoadBitmap(string file)
+        unsafe TSOTex LoadBitmap(string file)
         {
             using (FileStream fs = File.OpenRead(file))
             {
@@ -443,12 +444,49 @@ namespace Tso2MqoGui
                 BITMAPFILEHEADER bfh;
                 BITMAPINFOHEADER bih;
 
-                Marshal.Copy(br.ReadBytes(sizeof(BITMAPFILEHEADER)), 0, (IntPtr)(&bfh), sizeof(BITMAPFILEHEADER));
-                Marshal.Copy(br.ReadBytes(sizeof(BITMAPINFOHEADER)), 0, (IntPtr)(&bih), sizeof(BITMAPINFOHEADER));
+                byte[] buf;
 
-                if (bfh.bfType != 0x4D42) throw new Exception("Invalid imagetype: " + file);
-                if (bih.biBitCount != 24
-                && bih.biBitCount != 32) throw new Exception("Invalid depth: " + file);
+                bfh.bfType = br.ReadUInt16();
+
+                if (bfh.bfType != 0x4D42)
+                    throw new Exception("Invalid imagetype: " + file);
+
+                buf = br.ReadBytes(12);
+                bfh.bfSize = BitConverter.ToUInt32(buf, 0x00);
+                bfh.bfReserved1 = BitConverter.ToUInt16(buf, 0x04);
+                bfh.bfReserved2 = BitConverter.ToUInt16(buf, 0x06);
+                bfh.bfOffBits = BitConverter.ToUInt16(buf, 0x08);
+
+                uint biSize = br.ReadUInt32();
+
+                buf = br.ReadBytes((int)biSize - 4);
+                bih.biWidth             = BitConverter.ToInt32(buf, 0x00);
+                bih.biHeight            = BitConverter.ToInt32(buf, 0x04);
+                bih.biPlanes            = BitConverter.ToUInt16(buf, 0x08);
+                bih.biBitCount          = BitConverter.ToUInt16(buf, 0x0A);
+                bih.biCompression       = BitConverter.ToUInt32(buf, 0x0C);
+                bih.biSizeImage         = BitConverter.ToUInt32(buf, 0x10);
+                bih.biXPelsPerMeter     = BitConverter.ToInt32(buf, 0x14);
+                bih.biYPelsPerMeter     = BitConverter.ToInt32(buf, 0x18);
+                bih.biClrUsed           = BitConverter.ToUInt32(buf, 0x1C);
+                bih.biClrImportant      = BitConverter.ToUInt32(buf, 0x20);
+                if (biSize == 40)
+                {
+                    bih.bV5RedMask      = 0x00ff0000;
+                    bih.bV5GreenMask    = 0x0000ff00;
+                    bih.bV5BlueMask     = 0x000000ff;
+                    bih.bV5AlphaMask    = 0;
+                }
+                else if (biSize >= 56)
+                {
+                    bih.bV5RedMask      = BitConverter.ToUInt32(buf, 0x24);
+                    bih.bV5GreenMask    = BitConverter.ToUInt32(buf, 0x28);
+                    bih.bV5BlueMask     = BitConverter.ToUInt32(buf, 0x2C);
+                    bih.bV5AlphaMask    = BitConverter.ToUInt32(buf, 0x30);
+                }
+
+                if (bih.biBitCount != 24 && bih.biBitCount != 32)
+                    throw new Exception("Invalid depth: " + file);
 
                 TSOTex tex = new TSOTex();
                 tex.depth = bih.biBitCount / 8;
@@ -456,6 +494,30 @@ namespace Tso2MqoGui
                 tex.height = bih.biHeight;
                 tex.File = file;
                 tex.data = br.ReadBytes(tex.width * tex.height * tex.depth);
+
+                if (biSize == 40)
+                {
+                    for (int i = 0, n = tex.data.Length; i < n; i += tex.Depth)
+                    {
+                        byte b = tex.data[i + 0];
+                        tex.data[i + 0] = tex.data[i + 2];
+                        tex.data[i + 2] = b;
+                    }
+                }
+                else if (biSize >= 56)
+                {
+                    for (int i = 0, n = tex.data.Length; i < n; i += tex.Depth)
+                    {
+                        byte b0 = tex.data[i + 0];
+                        byte b1 = tex.data[i + 1];
+                        byte b2 = tex.data[i + 2];
+                        byte b3 = tex.data[i + 3];
+                        tex.data[i + 0] = b3;
+                        tex.data[i + 1] = b2;
+                        tex.data[i + 2] = b1;
+                        tex.data[i + 3] = b0;
+                    }
+                }
 
                 return tex;
             }
