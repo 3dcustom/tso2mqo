@@ -119,7 +119,7 @@ namespace Tso2MqoGui
 
             reader.Read();//Bone
 
-            if (reader.IsStartElement("P"))
+            while (reader.IsStartElement("P"))
             {
                 int id = int.Parse(reader.GetAttribute("id"));
                 reader.Read();//P
@@ -131,6 +131,11 @@ namespace Tso2MqoGui
                 int id = int.Parse(reader.GetAttribute("id"));
                 reader.Read();//C
                 this.cids.Add(id);
+            }
+
+            while (reader.IsStartElement("L"))
+            {
+                reader.Read();//L
             }
 
             while (reader.IsStartElement("W"))
