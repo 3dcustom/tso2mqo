@@ -396,15 +396,15 @@ namespace Tso2MqoGui
 
             switch (ext)
             {
-                case ".TGA": tex = LoadTarga(file); break;
-                case ".BMP": tex = LoadBitmap(file); break;
+                case ".TGA": tex = LoadTGA(file); break;
+                case ".BMP": tex = LoadBMP(file); break;
                 default: throw new Exception("Unsupported texture file: " + file);
             }
 
             return tex;
         }
 
-        unsafe TSOTex LoadTarga(string file)
+        unsafe TSOTex LoadTGA(string file)
         {
             using (FileStream fs = File.OpenRead(file))
             {
@@ -436,7 +436,7 @@ namespace Tso2MqoGui
             }
         }
 
-        unsafe TSOTex LoadBitmap(string file)
+        TSOTex LoadBMP(string file)
         {
             using (FileStream fs = File.OpenRead(file))
             {
