@@ -464,7 +464,7 @@ namespace Tso2MqoGui
             {
                 tabPage2.BackColor = Color.Tomato;
                 List<TSOMesh> meshes = new List<TSOMesh>();
-                Dictionary<string, Pair<TSOMaterial, int>> materialmap = new Dictionary<string, Pair<TSOMaterial, int>>();
+                Dictionary<string, KeyValuePair<TSOMaterial, int>> materialmap = new Dictionary<string, KeyValuePair<TSOMaterial, int>>();
                 Dictionary<string, TSOTex> textures = new Dictionary<string, TSOTex>();
                 TSOFile last = null;
 
@@ -495,8 +495,7 @@ namespace Tso2MqoGui
                         {
                             if (!materialmap.ContainsKey(mat.Name))
                             {
-                                Pair<TSOMaterial, int> value = new Pair<TSOMaterial, int>(mat, materialmap.Count);
-                                materialmap.Add(mat.Name, value);
+                                materialmap.Add(mat.Name, new KeyValuePair<TSOMaterial, int>(mat, materialmap.Count));
 
                                 if (!textures.ContainsKey(mat.ColorTex))
                                 {
@@ -524,14 +523,14 @@ namespace Tso2MqoGui
                     TSOMaterial[] mtllist = new TSOMaterial[materialmap.Count];
 
                     foreach (var i in materialmap.Values)
-                        mtllist[i.Second] = i.First;
+                        mtllist[i.Value] = i.Key;
 
                     foreach (TSOMesh mesh in meshes)
                     {
                         foreach (TSOSubMesh sub in mesh.sub_meshes)
                         {
                             TSOMaterial spec = mesh.file.materials[sub.spec];
-                            sub.spec = materialmap[spec.Name].Second;
+                            sub.spec = materialmap[spec.Name].Value;
                         }
                     }
 

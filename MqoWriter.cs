@@ -6,22 +6,6 @@ using System.Xml;
 
 namespace Tso2MqoGui
 {
-    public class Pair<T, U>
-    {
-        public T First;
-        public U Second;
-
-        public Pair()
-        {
-        }
-
-        public Pair(T first, U second)
-        {
-            First = first;
-            Second = second;
-        }
-    }
-
     public class MqoWriter : IDisposable
     {
         public TextWriter tw;
