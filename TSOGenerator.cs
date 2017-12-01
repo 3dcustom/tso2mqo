@@ -6,6 +6,8 @@ using System.Text;
 using System.Runtime.InteropServices;
 using System.ComponentModel;
 using System.Windows.Forms.Design;
+using System.Drawing;
+using System.Drawing.Imaging;
 
 namespace Tso2MqoGui
 {
@@ -398,6 +400,7 @@ namespace Tso2MqoGui
             {
                 case ".TGA": tex = LoadTGA(file); break;
                 case ".BMP": tex = LoadBMP(file); break;
+                case ".PNG": tex = LoadPNG(file); break;
                 default: throw new Exception("Unsupported texture file: " + file);
             }
 
@@ -521,6 +524,39 @@ namespace Tso2MqoGui
 
                 return tex;
             }
+        }
+
+        TSOTex LoadPNG(string file)
+        {
+            Bitmap bmp = new Bitmap(file);
+            BitmapData bmp_data = bmp.LockBits(new Rectangle(0, 0, bmp.Width, bmp.Height), ImageLockMode.ReadOnly, bmp.PixelFormat);
+
+            IntPtr ptr = bmp_data.Scan0;
+            int stride = bmp_data.Stride;
+            //bool bottom_up = (stride < 0);
+            if (stride < 0)
+                stride = -stride;
+            int bytes = stride * bmp_data.Height;
+            byte[] data = new byte[bytes];
+            Marshal.Copy(ptr, data, 0, bytes);
+
+            bmp.UnlockBits(bmp_data);
+
+            TSOTex tex = new TSOTex();
+            tex.depth = stride / bmp_data.Width;
+            tex.width = bmp_data.Width;
+            tex.height = bmp_data.Height;
+            tex.File = file;
+            tex.data = data;
+
+            for (int i = 0, n = tex.data.Length; i < n; i += tex.Depth)
+            {
+                byte b = tex.data[i + 0];
+                tex.data[i + 0] = tex.data[i + 2];
+                tex.data[i + 2] = b;
+            }
+
+            return tex;
         }
         #endregion
     }
