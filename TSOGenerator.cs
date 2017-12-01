@@ -528,26 +528,30 @@ namespace Tso2MqoGui
 
         TSOTex LoadPNG(string file)
         {
-            Bitmap bmp = new Bitmap(file);
-            BitmapData bmp_data = bmp.LockBits(new Rectangle(0, 0, bmp.Width, bmp.Height), ImageLockMode.ReadOnly, bmp.PixelFormat);
-
-            IntPtr ptr = bmp_data.Scan0;
-            int stride = bmp_data.Stride;
-            //bool bottom_up = (stride < 0);
-            if (stride < 0)
-                stride = -stride;
-            int bytes = stride * bmp_data.Height;
-            byte[] data = new byte[bytes];
-            Marshal.Copy(ptr, data, 0, bytes);
-
-            bmp.UnlockBits(bmp_data);
-
             TSOTex tex = new TSOTex();
-            tex.depth = stride / bmp_data.Width;
-            tex.width = bmp_data.Width;
-            tex.height = bmp_data.Height;
-            tex.File = file;
-            tex.data = data;
+
+            using (Bitmap bmp = new Bitmap(file))
+            {
+                BitmapData bmp_data = bmp.LockBits(new Rectangle(0, 0, bmp.Width, bmp.Height), ImageLockMode.ReadOnly, bmp.PixelFormat);
+
+                IntPtr ptr = bmp_data.Scan0;
+                int stride = bmp_data.Stride;
+                //bool bottom_up = (stride < 0);
+                if (stride < 0)
+                    stride = -stride;
+                int bytes = stride * bmp_data.Height;
+                byte[] data = new byte[bytes];
+                //NOTE: no exception
+                Marshal.Copy(ptr, data, 0, bytes);
+
+                bmp.UnlockBits(bmp_data);
+
+                tex.depth = stride / bmp_data.Width;
+                tex.width = bmp_data.Width;
+                tex.height = bmp_data.Height;
+                tex.File = file;
+                tex.data = data;
+            }
 
             for (int i = 0, n = tex.data.Length; i < n; i += tex.Depth)
             {

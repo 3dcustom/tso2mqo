@@ -42,7 +42,7 @@ namespace Tso2MqoGui
             return Path.Combine(OutPath, tex.GetFileName());
         }
 
-        public void CreateTextureFile(TSOTex tex)
+        public Bitmap CreateTextureBitmap(TSOTex tex)
         {
             GCHandle handle = GCHandle.Alloc(tex.data, GCHandleType.Pinned);
             //NOTE: no exception
@@ -51,9 +51,16 @@ namespace Tso2MqoGui
             Bitmap bmp = new Bitmap(tex.Width, tex.Height, tex.Depth * tex.Width, PixelFormat.Format32bppArgb, ptr);
             //NOTE: no exception
             handle.Free();
+            return bmp;
+        }
 
-            string file = GetTexturePath(tex);
-            bmp.Save(file);
+        public void CreateTextureFile(TSOTex tex)
+        {
+            using (Bitmap bmp = CreateTextureBitmap(tex))
+            {
+                string file = GetTexturePath(tex);
+                bmp.Save(file);
+            }
         }
 
         public void Write(TSOFile tso)
