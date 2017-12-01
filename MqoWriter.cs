@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Xml;
+using System.Runtime.InteropServices;
+using System.Drawing;
+using System.Drawing.Imaging;
 
 namespace Tso2MqoGui
 {
@@ -49,57 +52,16 @@ namespace Tso2MqoGui
 
         public void CreateTextureFile(TSOTex tex)
         {
+            GCHandle handle = GCHandle.Alloc(tex.data, GCHandleType.Pinned);
+            //NOTE: no exception
+            IntPtr ptr = handle.AddrOfPinnedObject();
+            //NOTE: no exception
+            Bitmap bmp = new Bitmap(tex.Width, tex.Height, tex.Depth * tex.Width, PixelFormat.Format32bppArgb, ptr);
+            //NOTE: no exception
+            handle.Free();
+
             string file = GetTexturePath(tex);
-            byte[] data = tex.data;
-
-            //TODO: .bmpのはずが.psdになってるものがある
-
-            using (FileStream fs = File.OpenWrite(file))
-            {
-                BinaryWriter bw = new BinaryWriter(fs);
-
-                switch (Path.GetExtension(file).ToUpper())
-                {
-                    case ".TGA":
-                        bw.Write((byte)0);              // id
-                        bw.Write((byte)0);              // colormap
-                        bw.Write((byte)2);              // imagetype
-                        bw.Write((byte)0);              // unknown0
-                        bw.Write((byte)0);              // unknown1
-                        bw.Write((byte)0);              // unknown2
-                        bw.Write((byte)0);              // unknown3
-                        bw.Write((byte)0);              // unknown4
-                        bw.Write((short)0);             // width
-                        bw.Write((short)0);             // height
-                        bw.Write((short)tex.Width);     // width
-                        bw.Write((short)tex.Height);    // height
-                        bw.Write((byte)(tex.depth * 8));// depth
-                        bw.Write((byte)0);              // depth
-                        break;
-
-                    default:
-                        bw.Write((byte)'B');
-                        bw.Write((byte)'M');
-                        bw.Write((int)(54 + data.Length));
-                        bw.Write((int)0);
-                        bw.Write((int)54);
-                        bw.Write((int)40);
-                        bw.Write((int)tex.Width);
-                        bw.Write((int)tex.Height);
-                        bw.Write((short)1);
-                        bw.Write((short)(tex.Depth * 8));
-                        bw.Write((int)0);
-                        bw.Write((int)data.Length);
-                        bw.Write((int)0);
-                        bw.Write((int)0);
-                        bw.Write((int)0);
-                        bw.Write((int)0);
-                        break;
-                }
-
-                bw.Write(data, 0, data.Length);
-                bw.Flush();
-            }
+            bmp.Save(file);
         }
 
         public void Write(TSOFile tso)
