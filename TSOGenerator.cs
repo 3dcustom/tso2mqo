@@ -532,6 +532,7 @@ namespace Tso2MqoGui
 
             using (Bitmap bmp = new Bitmap(file))
             {
+                bmp.RotateFlip(RotateFlipType.RotateNoneFlipY);
                 BitmapData bmp_data = bmp.LockBits(new Rectangle(0, 0, bmp.Width, bmp.Height), ImageLockMode.ReadOnly, bmp.PixelFormat);
 
                 IntPtr ptr = bmp_data.Scan0;

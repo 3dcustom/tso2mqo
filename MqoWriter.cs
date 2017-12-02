@@ -51,6 +51,7 @@ namespace Tso2MqoGui
             Bitmap bmp = new Bitmap(tex.Width, tex.Height, tex.Depth * tex.Width, PixelFormat.Format32bppArgb, ptr);
             //NOTE: no exception
             handle.Free();
+            bmp.RotateFlip(RotateFlipType.RotateNoneFlipY);
             return bmp;
         }
 
