@@ -165,7 +165,7 @@ namespace Tso2MqoGui
         public ImportTextureInfo(TSOTex tex)
         {
             Name = tex.Name;
-            File = tex.File.Trim('"');
+            File = tex.GetFileName();
             BytesPerPixel = tex.Depth;
             Width = tex.Width;
             Height = tex.Height;

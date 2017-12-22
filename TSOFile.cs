@@ -276,6 +276,11 @@ namespace Tso2MqoGui
             sb.Append("Data.Length: ").AppendLine(data.Length.ToString());
             return sb.ToString();
         }
+
+        public string GetFileName()
+        {
+            return Path.ChangeExtension(Path.GetFileName(file.Trim('"')), ".png");
+        }
     }
 
     public class TSOEffect
